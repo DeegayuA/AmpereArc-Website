@@ -133,7 +133,7 @@ export function CalculatorSection() {
   }, []);
 
   return (
-    <section className="relative w-full py-32 overflow-hidden bg-foreground">
+    <section className="relative w-full py-16 overflow-hidden bg-foreground">
       {/* Canvas Background */}
       <canvas 
         ref={canvasRef} 
@@ -141,13 +141,13 @@ export function CalculatorSection() {
       />
       
       {/* Content overlay */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 md:px-12 flex flex-col md:flex-row gap-16 items-center">
+      <div className="relative z-10 max-w-5xl mx-auto px-6 md:px-12 flex flex-col md:flex-row gap-10 items-center">
         
         <div className="flex-1 text-background">
-          <h2 className="text-4xl md:text-6xl font-bold font-heading mb-6 tracking-tight leading-tight">
+          <h2 className="text-4xl md:text-6xl font-bold font-heading mb-4 tracking-tight leading-tight">
             How much could you save with AmpereArc?
           </h2>
-          <p className="text-xl text-background/80 mb-8 max-w-md">
+          <p className="text-xl text-background/80 mb-6 max-w-md">
             Use our quick calculator to find out what switching to smart energy storage could do for your home.
           </p>
         </div>

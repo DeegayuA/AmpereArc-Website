@@ -38,9 +38,8 @@ export function Header() {
 
   return (
     <motion.header
-      className={`relative w-full transition-colors duration-500 ease-in-out ${
-        isScrolled ? "bg-background/80 backdrop-blur-lg border-b border-border/50" : "bg-transparent"
-      }`}
+      className={`relative w-full transition-colors duration-500 ease-in-out ${isScrolled ? "bg-background/80 backdrop-blur-lg border-b border-border/50" : "bg-transparent"
+        }`}
     >
       {/* Top Banner - hidden on scroll */}
       <AnimatePresence>
@@ -56,10 +55,10 @@ export function Header() {
               <Link href="/installer" className="hover:text-primary transition-colors">Installer</Link>
             </div>
             <div className="flex flex-row gap-4 items-center">
-               <Link href="/contact" className="hover:text-primary transition-colors">Contact us</Link>
-               <Link href="/get-in-touch" className="bg-primary text-primary-foreground px-4 py-1 rounded-full font-medium hover:bg-primary/90 transition-colors">
-                 Get In Touch
-               </Link>
+              <Link href="/contact" className="hover:text-primary transition-colors">Contact us</Link>
+              <Link href="/get-in-touch" className="bg-primary text-primary-foreground px-4 py-1 rounded-full font-medium hover:bg-primary/90 transition-colors">
+                Get In Touch
+              </Link>
             </div>
           </motion.div>
         )}
@@ -70,11 +69,14 @@ export function Header() {
         {/* Dynamic Logo */}
         <Link href="/" className="flex items-center gap-3 relative z-10 group">
           <div className="relative w-10 h-10">
-            <Image 
-              src={isScrolled || isDark ? "/assets/Logos/AmpereArc-Symbol-WT.png" : "/assets/Logos/AmpereArc-Symbol-CLR.png"} 
-              alt="AmpereArc Logo" 
-              fill 
-              className="object-contain"
+            <Image
+              src="/assets/Logos/AmpereArc-Symbol-CLR.png"
+              alt="AmpereArc Logo"
+              fill
+              className={`object-contain transition-all duration-500 ease-in-out ${isScrolled
+                  ? (isDark ? "brightness-0 invert opacity-100" : "grayscale brightness-0 opacity-80")
+                  : "brightness-100 invert-0 opacity-100"
+                }`}
               sizes="40px"
               priority
             />
@@ -94,20 +96,26 @@ export function Header() {
         </div>
 
         <div className="hidden lg:flex items-center gap-4">
-            <GooeyInput placeholder="Search..." collapsedWidth={120} expandedWidth={220} />
-            
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full bg-secondary/10 hover:bg-secondary/20 transition-colors"
-              aria-label="Toggle theme"
-            >
-              {mounted ? (
-                isDark ? <Sun className="w-5 h-5 text-primary" /> : <Moon className="w-5 h-5 text-primary" />
-              ) : (
-                <div className="w-5 h-5" />
-              )}
-            </button>
+          <GooeyInput
+            placeholder="Search..."
+            collapsedWidth={120}
+            expandedWidth={220}
+            className="z-10"
+          />
+
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-full bg-transparent backdrop-blur-md border transition-all duration-300 ${!isDark && !isScrolled ? "text-white border-white/40 hover:border-white" : "text-foreground border-border/50 hover:border-primary/50"
+              }`}
+            aria-label="Toggle theme"
+          >
+            {mounted ? (
+              isDark ? <Sun className="w-5 h-5 text-primary" /> : <Moon className="w-5 h-5 text-primary" />
+            ) : (
+              <div className="w-5 h-5" />
+            )}
+          </button>
         </div>
 
         {/* Mobile Toggle */}
@@ -115,35 +123,36 @@ export function Header() {
           {/* Mobile Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full bg-secondary/10"
+            className={`p-2 rounded-full bg-transparent backdrop-blur-md border transition-all duration-300 ${!isDark && !isScrolled ? "text-white border-white/40" : "text-foreground border-border/50"
+              }`}
             aria-label="Toggle theme"
           >
             {mounted && (isDark ? <Sun className="w-5 h-5 text-primary" /> : <Moon className="w-5 h-5 text-primary" />)}
           </button>
-          <button className="p-2" onClick={() => setMobileOpen(!mobileOpen)}>
+          <button className={`p-2 ${!isDark && !isScrolled ? "text-white" : "text-foreground"}`} onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X /> : <Menu />}
           </button>
         </div>
       </nav>
-      
+
       {/* Mobile Menu */}
       <AnimatePresence>
-         {mobileOpen && (
-           <motion.div
-             initial={{ height: 0, opacity: 0 }}
-             animate={{ height: "auto", opacity: 1 }}
-             exit={{ height: 0, opacity: 0 }}
-             className="lg:hidden bg-background border-b border-border overflow-hidden"
-           >
-             <div className="flex flex-col p-6 gap-4">
-                {links.map((link) => (
-                  <Link key={link.name} href={link.href} className="font-medium text-lg border-b border-border/50 pb-2">
-                    {link.name}
-                  </Link>
-                ))}
-             </div>
-           </motion.div>
-         )}
+        {mobileOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="lg:hidden bg-background border-b border-border overflow-hidden"
+          >
+            <div className="flex flex-col p-6 gap-4">
+              {links.map((link) => (
+                <Link key={link.name} href={link.href} className="font-medium text-lg border-b border-border/50 pb-2">
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </motion.header>
   );

@@ -13,14 +13,14 @@ const sampleMarkers: GlobeMarker[] = [
 
 export function GlobeSection() {
   return (
-    <section className="py-24 px-6 md:px-12 bg-background relative overflow-hidden">
+    <section className="py-16 px-6 md:px-12 bg-background relative overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-10">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold font-heading mb-6"
+            className="text-4xl md:text-5xl font-bold font-heading mb-4"
           >
             Trusted Worldwide
           </motion.h2>
@@ -35,17 +35,20 @@ export function GlobeSection() {
           </motion.p>
         </div>
 
-        <div className="relative mx-auto h-[500px] w-full max-w-5xl overflow-hidden rounded-3xl bg-secondary shadow-lg shadow-black/5 dark:shadow-none border border-border">
-          <div className="relative z-10 p-8 md:p-12 h-full flex flex-col justify-end pointer-events-none">
+        <div className="relative mx-auto h-[560px] md:h-[500px] w-full max-w-5xl overflow-hidden rounded-3xl bg-secondary shadow-lg shadow-black/5 dark:shadow-none border border-border flex flex-col md:block">
+          {/* Subtle Glow Backdrop for Mobile */}
+          <div className="absolute top-0 inset-x-0 h-1/2 bg-[radial-gradient(circle_at_50%_40%,rgba(245,138,61,0.12),transparent_70%)] md:hidden z-0" />
+          
+          <div className="relative z-10 p-6 md:p-10 h-full flex flex-col justify-end items-center text-center md:items-start md:text-left pointer-events-none">
             <h3 className="max-w-md text-3xl font-extrabold tracking-tight text-white font-heading">
               Clean Energy At Scale
             </h3>
-            <p className="mt-4 max-w-sm text-secondary-foreground/80 text-sm">
+            <p className="mt-4 max-w-sm text-secondary-foreground/80 text-sm pb-2">
               From homes to businesses, we provide scalable solutions that support global net-zero goals.
             </p>
           </div>
           
-          <div className="absolute right-[-20%] bottom-[-20%] z-0 w-[80%] h-[120%] pointer-events-auto">
+          <div className="absolute inset-x-0 md:inset-auto md:right-[-20%] md:bottom-[-20%] z-0 w-full h-[75%] md:w-[80%] md:h-[120%] top-0 md:top-auto pointer-events-auto">
             <Globe3D
               className="w-full h-full"
               markers={sampleMarkers}
@@ -59,7 +62,7 @@ export function GlobeSection() {
           </div>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-border">
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-border">
            <div className="pt-8 md:pt-0">
              <div className="text-5xl font-heading font-black text-primary mb-2">00k+</div>
              <div className="text-foreground/70 font-medium tracking-wider uppercase text-sm">Installations Worldwide</div>

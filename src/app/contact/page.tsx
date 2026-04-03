@@ -24,8 +24,12 @@ export default function ContactPage() {
 
         <div className="text-center bg-secondary text-secondary-foreground p-12 rounded-3xl">
            <h2 className="text-3xl font-bold font-heading mb-6">Can’t Find Your Answer?</h2>
-           <p className="text-lg opacity-80 mb-2">Email – support@amperearc.com</p>
-           <p className="text-lg opacity-80">Call Us On – +1 (800) 123-4567</p>
+           <p className="text-lg opacity-80 mb-2 font-medium">
+             Email – <a href="mailto:Info@amperearc.com" className="hover:underline opacity-100 font-bold decoration-primary underline-offset-4">Info@amperearc.com</a>
+           </p>
+           <p className="text-lg opacity-80 font-medium">
+             Call Us On – <a href="tel:+447766130423" className="hover:underline opacity-100 font-bold decoration-primary underline-offset-4">+44 7766 130423</a>
+           </p>
         </div>
       </div>
     </div>

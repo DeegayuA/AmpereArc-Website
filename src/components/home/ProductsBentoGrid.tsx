@@ -1,156 +1,241 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
+import { ChevronDown, ChevronUp, Home, Building2, LayoutGrid, Zap, Battery, Car, Sun, ArrowRight } from "lucide-react";
 import { products, categories, subCategories } from "@/lib/data";
 
 export function ProductsBentoGrid() {
   const [activeCat, setActiveCat] = useState("Home");
   const [activeSub, setActiveSub] = useState("BESS (Battery Energy Storage)");
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Reset expansion when navigation changes
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [activeCat, activeSub]);
+
+  // Detect mobile/tablet for progressive disclosure
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const filteredProducts = useMemo(() => {
     return products.filter(p => p.category === activeCat && p.subCategory === activeSub);
   }, [activeCat, activeSub]);
 
+  /**
+   * SE LEVEL MASONRY HASHING
+   * Generates a repeatable but unique layout pattern for each (Category + SubCategory)
+   */
+  const gridProducts = useMemo(() => {
+    const hash = (str: string) => {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) {
+        h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+      }
+      return Math.abs(h);
+    };
+
+    const seed = hash(activeCat + activeSub);
+
+    return filteredProducts.map((p, idx) => {
+      // Deterministic "random" layout based on seed and index
+      const val = (seed + idx) % 10;
+
+      let spans = "";
+      if (val === 0) spans = "md:col-span-2 md:row-span-2"; // Large square
+      else if (val === 2 || val === 5) spans = "md:col-span-2 md:row-span-1"; // Wide rectangle
+      else spans = "md:col-span-1 md:row-span-1"; // Standard
+
+      return { ...p, spans };
+    });
+  }, [filteredProducts, activeCat, activeSub]);
+
+  const displayedProducts = useMemo(() => {
+    if (isMobile && !isExpanded) {
+      // Best SE Practice: Show exactly 4 items (2 rows of 2) for maximum screen density on mobile
+      return gridProducts.slice(0, 4);
+    }
+    return gridProducts;
+  }, [gridProducts, isMobile, isExpanded]);
+
   return (
-    <section id="products" className="py-24 px-6 md:px-12 bg-muted/30">
+    <section id="products" className="py-12 px-6 md:px-12 bg-muted/30 scroll-mt-20">
       <div className="max-w-[1400px] mx-auto">
-        <div className="mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold font-heading mb-4 text-foreground">
-            Smarter Products. Superior Savings.
-          </h2>
-          <p className="text-lg text-foreground/70 max-w-2xl">
-            Explore our range of intelligent hardware designed to give you complete control over your home or commercial energy ecosystem.
-          </p>
+
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-10">
+          <div className="max-w-2xl">
+            <h2 className="text-4xl md:text-6xl font-bold font-heading mb-4 text-foreground tracking-tight leading-[1.1]">
+              Intelligent Energy. <br />
+              <span className="text-primary italic">At Your Fingertips.</span>
+            </h2>
+            <p className="text-lg text-foreground/70 font-sans max-w-lg">
+              Precision hardware optimized for world-class efficiency. Select your domain to explore the collection.
+            </p>
+          </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-12">
-          {/* Sidebar */}
-          <aside className="lg:w-80 shrink-0 flex flex-col gap-8">
-            <div className="flex gap-2 p-1 bg-border/40 rounded-lg">
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCat(cat)}
-                  className={`flex-1 py-2 text-sm font-bold uppercase tracking-wider rounded-md transition-colors ${
-                    activeCat === cat ? "bg-background shadow-sm text-primary" : "text-foreground/60 hover:text-foreground"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-            <div className="flex flex-col gap-2 border-l-2 border-border/60 pl-4">
-              {subCategories.map(sub => (
-                <button
-                  key={sub}
-                  onClick={() => setActiveSub(sub)}
-                  className={`text-left py-2 px-3 rounded-md transition-colors text-sm font-medium ${
-                    activeSub === sub ? "bg-primary/10 text-primary border-l-2 -ml-[18px] border-primary" : "text-foreground/70 hover:bg-border/30 hover:text-foreground"
-                  }`}
-                >
-                  {sub}
-                </button>
-              ))}
-            </div>
-          </aside>
+        {/* Dual-Panel Domain Selection (Always Side-by-Side) */}
+        <div className="grid grid-cols-2 gap-3 md:gap-6 mb-8">
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCat(cat)}
+              className={`relative overflow-hidden group h-24 md:h-32 rounded-2xl md:rounded-[2rem] border-2 transition-all duration-700 flex flex-col md:flex-row items-center justify-center md:justify-between p-4 md:p-8 ${activeCat === cat
+                  ? "bg-primary text-white border-primary shadow-2xl shadow-primary/20 scale-[1.01]"
+                  : "bg-card text-foreground border-border/60 hover:border-primary/40 hover:bg-primary/5"
+                }`}
+            >
+              <div className="relative z-10 flex flex-col items-center md:items-start text-center md:text-left gap-1">
+                <span className={`text-[10px] md:text-xs font-black uppercase tracking-[0.2em] ${activeCat === cat ? "text-white/70" : "text-primary/70"}`}>
+                  Explore
+                </span>
+                <span className="text-xl md:text-3xl font-heading font-black">{cat}</span>
+              </div>
 
-          {/* Bento Grid */}
-          <div className="flex-1 min-h-[500px]">
-             <AnimatePresence mode="wait">
-               {filteredProducts.length > 0 ? (
-                 <motion.div 
-                   key={`${activeCat}-${activeSub}`}
-                   initial={{ opacity: 0, y: 20 }}
-                   animate={{ opacity: 1, y: 0 }}
-                   exit={{ opacity: 0, y: -20 }}
-                   transition={{ duration: 0.4 }}
-                   className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[25rem]"
-                 >
-                   {filteredProducts.map((item) => (
-                     <BentoCard key={item.id} item={item} />
-                   ))}
-                 </motion.div>
-               ) : (
-                 <motion.div 
-                   initial={{ opacity: 0 }}
-                   animate={{ opacity: 1 }}
-                   className="h-full flex flex-col items-center justify-center text-center p-12 border-2 border-dashed border-border rounded-3xl"
-                 >
-                   <div className="text-xl font-bold mb-2">No products in this category yet</div>
-                   <p className="text-muted-foreground">We are constantly expanding our portfolio. Check back soon!</p>
-                 </motion.div>
-               )}
-             </AnimatePresence>
-          </div>
+              <div className={`hidden md:flex p-4 rounded-2xl transition-all duration-700 group-hover:scale-110 group-hover:rotate-6 ${activeCat === cat ? "bg-white/20" : "bg-primary/5 text-primary"}`}>
+                {cat === "Home" ? <Home className="w-8 h-8" /> : <Building2 className="w-8 h-8" />}
+              </div>
+
+              {/* Mobile Icon (Smaller) */}
+              <div className="md:hidden mt-2">
+                {cat === "Home" ? <Home className="w-5 h-5 opacity-40" /> : <Building2 className="w-5 h-5 opacity-40" />}
+              </div>
+
+              {/* Decorative Glow */}
+              <div className={`absolute inset-0 transition-opacity duration-1000 ${activeCat === cat ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+                <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 blur-[80px] rounded-full" />
+                <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-white/10 blur-[80px] rounded-full" />
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Sub-Category Chip Navigation */}
+        <div className="flex overflow-x-auto pb-4 gap-3 scrollbar-hide mb-8 border-b border-border/40">
+          {subCategories.map(sub => (
+            <button
+              key={sub}
+              onClick={() => setActiveSub(sub)}
+              className={`whitespace-nowrap px-6 py-2.5 rounded-full text-xs md:text-sm font-bold transition-all duration-300 border ${activeSub === sub
+                  ? "bg-foreground text-background border-foreground shadow-lg scale-105"
+                  : "bg-card text-foreground/60 border-border/80 hover:border-primary/40 hover:text-primary"
+                }`}
+            >
+              {sub}
+            </button>
+          ))}
+        </div>
+
+        {/* High-Density Grid Architecture */}
+        <div className="min-h-[500px]">
+          <AnimatePresence mode="wait">
+            {gridProducts.length > 0 ? (
+              <motion.div
+                key={`${activeCat}-${activeSub}`}
+                initial={{ opacity: 0, scale: 0.99, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.99, y: -10 }}
+                transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 auto-rows-[14rem] md:auto-rows-[18rem] grid-flow-dense"
+              >
+                {displayedProducts.map((item, idx) => (
+                  <BentoCard key={item.id} item={item} index={idx} isMobile={isMobile} />
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="h-[300px] flex flex-col items-center justify-center text-center p-12 border-2 border-dashed border-border rounded-3xl"
+              >
+                <div className="text-xl font-bold mb-2">Portfolio Coming Soon</div>
+                <p className="text-muted-foreground text-sm">We are standardizing our hardware for this category.</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* High-Performance Expansion Button */}
+          {isMobile && filteredProducts.length > 4 && (
+            <div className="mt-12 flex justify-center lg:hidden">
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="group relative inline-flex items-center gap-2 px-8 py-3.5 bg-background border border-border text-foreground text-[10px] font-black uppercase tracking-[0.3em] rounded-full hover:bg-primary hover:text-white hover:border-primary transition-all duration-500 shadow-xl shadow-black/5"
+              >
+                {isExpanded ? (
+                  <>Show Less <ChevronUp className="w-3 h-3 group-hover:-translate-y-1 transition-transform" /></>
+                ) : (
+                  <>View Full Collection ({filteredProducts.length}) <ChevronDown className="w-3 h-3 group-hover:translate-y-1 transition-transform" /></>
+                )}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>
   );
 }
 
-function BentoCard({ item }: { item: typeof products[0] }) {
+function BentoCard({ item, index, isMobile }: { item: typeof products[0] & { spans: string }, index: number, isMobile: boolean }) {
   const [isLoaded, setIsLoaded] = useState(false);
-  
+
   return (
     <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay: index * 0.04 }}
       whileHover="hover"
-      className={`relative rounded-3xl overflow-hidden bg-card border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.01)] group ${item.className || ""}`}
+      className={`relative rounded-xl md:rounded-[2rem] overflow-hidden bg-card border border-white/5 dark:border-white/10 shadow-sm group transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 ${isMobile ? 'col-span-1 row-span-1' : item.spans}`}
     >
-      {/* Skeleton / Fallback BG */}
-      <div className={`absolute inset-0 bg-muted animate-pulse ${isLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-500`} />
-      
-      {/* Background Image filling skeleton strictly */}
-      <Image 
-        src={item.img} 
-        alt={item.title} 
-        fill 
-        onLoad={() => setIsLoaded(true)}
-        className={`object-cover transition-all duration-700 ease-out group-hover:scale-105 group-hover:opacity-60 opacity-80 ${isLoaded ? 'blur-0 scale-100' : 'blur-xl scale-110'}`}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
-      
-      {/* Content wrapper */}
-      <div className="absolute inset-0 p-8 flex flex-col justify-end">
-        {/* Animated Horizontal text on hover */}
-        <div className="overflow-hidden mb-4">
-          <motion.h3 
-            variants={{
-              initial: { x: 0 },
-              hover: { x: 8 }
-            }}
-            transition={{ type: "spring", bounce: 0.4 }}
-            className="text-2xl font-bold font-heading text-card-foreground mb-2"
+      {/* Dynamic Edge Highlight */}
+      <div className="absolute inset-0 z-10 p-[1px] bg-gradient-to-tr from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-xl md:rounded-[2rem] pointer-events-none" />
+
+      {/* Background Asset */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src={item.img}
+          alt={item.title}
+          fill
+          onLoad={() => setIsLoaded(true)}
+          className={`object-cover transition-all duration-1000 ease-out group-hover:scale-105 group-hover:opacity-40 opacity-70 ${isLoaded ? 'blur-0' : 'blur-lg'}`}
+        />
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-background via-background/20 to-transparent" />
+      </div>
+
+      {/* Content Engine */}
+      <div className="absolute inset-0 p-4 md:p-8 flex flex-col justify-end z-10">
+        <div className="mb-2 md:mb-5">
+          <motion.h3
+            className="text-sm md:text-2xl font-bold font-heading text-foreground mb-1 md:mb-2 leading-tight group-hover:text-primary transition-colors"
           >
             {item.title}
           </motion.h3>
-          <motion.p 
-            variants={{
-              initial: { x: 0, opacity: 0.8 },
-              hover: { x: 8, opacity: 1 }
-            }}
-            transition={{ type: "spring", bounce: 0.4, delay: 0.05 }}
-            className="text-card-foreground/80 text-sm max-w-[80%]"
-          >
+          <p className="hidden md:block text-foreground/60 text-xs md:text-sm line-clamp-2 md:max-w-[90%] pointer-events-none">
             {item.desc}
-          </motion.p>
+          </p>
         </div>
 
-        {/* Savings Stats */}
-        <div className="mt-4 grid grid-cols-3 gap-2 bg-background/80 backdrop-blur-md rounded-xl p-4 border border-border/50">
-           <div>
-             <div className="text-xs text-muted-foreground uppercase font-bold mb-1">Previous</div>
-             <div className="font-mono text-foreground/50 line-through">{item.prevBill}</div>
-           </div>
-           <div>
-             <div className="text-xs text-muted-foreground uppercase font-bold mb-1">With Us</div>
-             <div className="font-mono font-bold text-foreground">{item.nowBill}</div>
-           </div>
-           <div className="text-right">
-             <div className="text-xs text-primary uppercase font-bold mb-1">Savings</div>
-             <div className="font-heading font-black text-2xl text-primary leading-none">{item.savings}</div>
-           </div>
+        {/* Compressed Savings Stats (Responsive) */}
+        <div className="flex md:grid grid-cols-3 gap-1 md:gap-2 bg-background/50 dark:bg-black/30 backdrop-blur-md rounded-lg md:rounded-2xl p-2 md:p-4 border border-white/5 group-hover:border-primary/20 transition-all">
+          <div className="hidden md:block">
+            <div className="text-[8px] md:text-[9px] text-muted-foreground uppercase font-black tracking-tighter mb-1 opacity-50">Old</div>
+            <div className="font-mono text-[9px] md:text-xs text-foreground/30 line-through">{item.prevBill}</div>
+          </div>
+          <div className="flex-1">
+            <div className="text-[8px] md:text-[9px] text-primary uppercase font-black tracking-tighter mb-0.5 md:mb-1">Save</div>
+            <div className="font-heading font-black text-xs md:text-xl text-primary leading-none">{item.savings}</div>
+          </div>
+          <div className="hidden md:block text-right">
+            <ArrowRight className="inline-block w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-all translate-x-1 group-hover:translate-x-0" />
+          </div>
         </div>
       </div>
     </motion.div>

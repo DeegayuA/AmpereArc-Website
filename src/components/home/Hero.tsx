@@ -77,13 +77,13 @@ export function Hero() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-20 pb-40 px-6 md:px-24 w-full max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-end gap-12">
+      <div className="relative z-20 pb-24 px-6 md:px-24 w-full max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-end gap-8">
         <div className="max-w-2xl">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-5xl md:text-7xl font-bold font-heading text-foreground mb-6 leading-tight"
+            className="text-5xl md:text-7xl font-bold font-heading text-foreground mb-4 leading-tight"
             style={{ WebkitTextStroke: "1px rgba(255,255,255,0.1)" }}
           >
             Smarter, Greener Energy Storage
@@ -92,7 +92,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-lg md:text-xl text-foreground/80 mb-10 max-w-xl font-sans"
+            className="text-lg md:text-xl text-foreground/80 mb-6 max-w-xl font-sans"
           >
             At AmpereArc, we manufacture world-leading systems that put power back in your hands. Future-proof your energy supply today.
           </motion.p>
@@ -133,7 +133,7 @@ export function Hero() {
       </div>
 
       {/* Bottom Triggers */}
-      <div className="absolute bottom-0 left-0 right-0 z-30 h-[100px] bg-background/50 backdrop-blur-md border-t border-border/30 grid grid-cols-3 divide-x divide-border/30">
+      <div className="absolute bottom-0 left-0 right-0 z-30 h-[80px] bg-background/50 backdrop-blur-md border-t border-border/30 grid grid-cols-3 divide-x divide-border/30">
         <TriggerButton
           title="Homeowner"
           desc="Lower your bills & store solar"
