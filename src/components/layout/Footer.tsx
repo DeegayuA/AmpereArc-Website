@@ -12,7 +12,7 @@ export function Footer() {
         <div className="flex flex-col gap-6 lg:col-span-1">
           <Link href="/" className="flex items-center gap-3">
              <Image 
-               src="/assets/Logos/AmpereArc%20Symbol%20WT.png" 
+               src="/assets/Logos/AmpereArc-Symbol-WT.png" 
                alt="AmpereArc Logo" 
                width={40} 
                height={40} 

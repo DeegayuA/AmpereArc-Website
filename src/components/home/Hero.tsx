@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -14,9 +14,31 @@ const backgrounds = {
 export function Hero() {
   const [bg, setBg] = useState<keyof typeof backgrounds>("home");
   const [isLoaded, setIsLoaded] = useState(false);
+  
+  // Parallax setup
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  
+  const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
+  const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
+  
+  const translateX = useTransform(springX, [-1, 1], [-10, 10]);
+  const translateY = useTransform(springY, [-1, 1], [-10, 10]);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const { clientX, clientY } = e;
+    const { innerWidth, innerHeight } = window;
+    
+    // Normalize to [-1, 1]
+    mouseX.set((clientX / innerWidth) * 2 - 1);
+    mouseY.set((clientY / innerHeight) * 2 - 1);
+  };
 
   return (
-    <section className="relative w-full h-screen min-h-[800px] overflow-hidden flex flex-col justify-end bg-background">
+    <section 
+      onMouseMove={handleMouseMove}
+      className="relative w-full h-screen min-h-[800px] overflow-hidden flex flex-col justify-end bg-background"
+    >
       {/* Background Image with Mask */}
       <div className="absolute inset-0 z-0 bg-muted/20">
         <AnimatePresence mode="popLayout">
@@ -24,15 +46,22 @@ export function Hero() {
             key={bg}
             src={backgrounds[bg]}
             initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            onLoad={() => setIsLoaded(true)}
-            transition={{ duration: 1.2, ease: "easeInOut" }}
-            className="w-full h-full object-cover"
+            animate={{ 
+              opacity: 1, 
+              scale: 1,
+              x: translateX.get(),
+              y: translateY.get()
+            }}
             style={{
+              x: translateX,
+              y: translateY,
               maskImage: "radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)",
               WebkitMaskImage: "radial-gradient(ellipse at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)",
             }}
+            exit={{ opacity: 0 }}
+            onLoad={() => setIsLoaded(true)}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+            className="w-full h-full object-cover origin-center"
           />
         </AnimatePresence>
         {/* Dark overlay for text readability */}

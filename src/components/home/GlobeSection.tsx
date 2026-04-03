@@ -61,15 +61,15 @@ export function GlobeSection() {
 
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-border">
            <div className="pt-8 md:pt-0">
-             <div className="text-5xl font-heading font-black text-primary mb-2">50k+</div>
+             <div className="text-5xl font-heading font-black text-primary mb-2">00k+</div>
              <div className="text-foreground/70 font-medium tracking-wider uppercase text-sm">Installations Worldwide</div>
            </div>
            <div className="pt-8 md:pt-0">
-             <div className="text-5xl font-heading font-black text-primary mb-2">2.5 GWh</div>
+             <div className="text-5xl font-heading font-black text-primary mb-2">0.0 GWh</div>
              <div className="text-foreground/70 font-medium tracking-wider uppercase text-sm">Total Energy Stored</div>
            </div>
            <div className="pt-8 md:pt-0">
-             <div className="text-5xl font-heading font-black text-primary mb-2">1M+ Tons</div>
+             <div className="text-5xl font-heading font-black text-primary mb-2">000+ Tons</div>
              <div className="text-foreground/70 font-medium tracking-wider uppercase text-sm">CO2 Offset Annually</div>
            </div>
         </div>

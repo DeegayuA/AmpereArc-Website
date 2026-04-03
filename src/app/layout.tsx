@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Providers } from "@/components/Providers";
+import { DevBanner } from "@/components/layout/DevBanner";
 
 const genos = Genos({
   variable: "--font-genos",
@@ -34,7 +35,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans transition-colors duration-300">
         <Providers>
           <Header />
-          <main className="flex-1">{children}</main>
+          <DevBanner />
+          <main className="flex-1 overflow-x-hidden">{children}</main>
           <Footer />
         </Providers>
       </body>

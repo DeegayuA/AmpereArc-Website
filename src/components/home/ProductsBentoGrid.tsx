@@ -24,7 +24,7 @@ const gridItems = [
     nowBill: "$40",
     savings: "84%",
     className: "col-span-1 md:col-span-1",
-    img: "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?q=80&w=600&auto=format&fit=crop"
+    img: "https://images.unsplash.com/photo-1620714223084-8dfacc6dfd8d?q=80&w=600&auto=format&fit=crop"
   },
   {
     title: "Hybrid Inverter XT",
@@ -33,7 +33,7 @@ const gridItems = [
     nowBill: "$60",
     savings: "80%",
     className: "col-span-1 md:col-span-1",
-    img: "https://images.unsplash.com/photo-1592833159057-6fcdd4582e07?q=80&w=600&auto=format&fit=crop"
+    img: "https://images.unsplash.com/photo-1508514177221-18d14037b7b2?q=80&w=600&auto=format&fit=crop"
   },
   {
     title: "EV Fast Charger",
@@ -42,7 +42,7 @@ const gridItems = [
     nowBill: "$20",
     savings: "86%",
     className: "col-span-1 md:col-span-1",
-    img: "https://images.unsplash.com/photo-1652796123023-e2cc5f3efac6?q=80&w=600&auto=format&fit=crop"
+    img: "https://images.unsplash.com/photo-1617788130097-14a95585149a?q=80&w=600&auto=format&fit=crop"
   },
   {
     title: "Commercial BESS Stack",
@@ -51,7 +51,7 @@ const gridItems = [
     nowBill: "$800",
     savings: "68%",
     className: "col-span-1 md:col-span-2",
-    img: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop"
+    img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop"
   },
   {
     title: "Smart Meter",
@@ -60,7 +60,7 @@ const gridItems = [
     nowBill: "-",
     savings: "Opt.",
     className: "col-span-1 md:col-span-1",
-    img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600&auto=format&fit=crop"
+    img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop"
   }
 ];
 
