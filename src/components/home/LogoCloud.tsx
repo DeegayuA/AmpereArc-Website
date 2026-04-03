@@ -44,10 +44,13 @@ export function LogoCloud() {
                 className="relative h-12 w-full max-w-[120px] grayscale hover:grayscale-0 transition-all duration-300 dark:invert opacity-70 hover:opacity-100"
               >
                 <img
-                  src={`https://logo.clearbit.com/${logo.domain}`}
+                  src={`https://unavatar.io/${logo.domain}?fallback=https://logo.clearbit.com/${logo.domain}`}
                   alt={`${logo.name} Logo`}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain filter grayscale brightness-100 contrast-125 dark:invert dark:brightness-200 group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-500"
                   loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(logo.name)}&background=random&color=fff`;
+                  }}
                 />
               </motion.div>
             ))}

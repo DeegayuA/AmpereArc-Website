@@ -38,7 +38,7 @@ export function Header() {
 
   return (
     <motion.header
-      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-500 ease-in-out ${
+      className={`relative w-full transition-colors duration-500 ease-in-out ${
         isScrolled ? "bg-background/80 backdrop-blur-lg border-b border-border/50" : "bg-transparent"
       }`}
     >

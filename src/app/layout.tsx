@@ -40,8 +40,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans transition-colors duration-300">
         <Providers>
-          <Header />
-          <DevBanner />
+          <div className="fixed top-0 left-0 right-0 z-50 flex flex-col">
+            <DevBanner />
+            <Header />
+          </div>
           <main className="flex-1 overflow-x-hidden">{children}</main>
           <Footer />
         </Providers>

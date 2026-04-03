@@ -22,8 +22,8 @@ export function Hero() {
   const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
   const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
   
-  const translateX = useTransform(springX, [-1, 1], [-10, 10]);
-  const translateY = useTransform(springY, [-1, 1], [-10, 10]);
+  const translateX = useTransform(springX, [-1, 1], [-30, 30]);
+  const translateY = useTransform(springY, [-1, 1], [-30, 30]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const { clientX, clientY } = e;
@@ -45,10 +45,10 @@ export function Hero() {
           <motion.img
             key={bg}
             src={backgrounds[bg]}
-            initial={{ opacity: 0, scale: 1.05 }}
+            initial={{ opacity: 0, scale: 1.2 }}
             animate={{ 
               opacity: 1, 
-              scale: 1,
+              scale: 1.1, 
               x: translateX.get(),
               y: translateY.get()
             }}
