@@ -2,18 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
-
-// Placeholder logos for demo
-const allLogos = Array.from({ length: 20 }).map((_, i) => ({
-  id: `logo-${i}`,
-  src: `https://logo.clearbit.com/${[
-    "tesla.com", "google.com", "microsoft.com", "apple.com", "amazon.com",
-    "meta.com", "netflix.com", "spotify.com", "samsung.com", "panasonic.com",
-    "lg.com", "sony.com", "intel.com", "amd.com", "nvidia.com",
-    "siemens.com", "ge.com", "schneider-electric.com", "abb.com", "sunrun.com",
-  ][i]}`
-}));
+import { partners } from "@/lib/data";
 
 export function LogoCloud() {
   const [currentPage, setCurrentPage] = useState(0);
@@ -21,11 +10,15 @@ export function LogoCloud() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentPage((prev) => (prev === 0 ? 1 : 0));
-    }, 3000);
+    }, 4000);
     return () => clearInterval(timer);
   }, []);
 
-  const visibleLogos = currentPage === 0 ? allLogos.slice(0, 10) : allLogos.slice(10, 20);
+  const logosPerPage = 10;
+  const visibleLogos = partners.slice(
+    currentPage * logosPerPage, 
+    (currentPage + 1) * logosPerPage
+  );
 
   return (
     <section className="py-24 px-6 md:px-12 bg-background border-t border-border/40 overflow-hidden">
@@ -38,7 +31,7 @@ export function LogoCloud() {
           <AnimatePresence mode="popLayout">
             {visibleLogos.map((logo, index) => (
               <motion.div
-                key={logo.id}
+                key={logo.domain}
                 layout
                 initial={{ opacity: 0, x: 40, filter: "blur(10px)" }}
                 animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
@@ -51,9 +44,10 @@ export function LogoCloud() {
                 className="relative h-12 w-full max-w-[120px] grayscale hover:grayscale-0 transition-all duration-300 dark:invert opacity-70 hover:opacity-100"
               >
                 <img
-                  src={logo.src}
-                  alt="Partner Logo"
+                  src={`https://logo.clearbit.com/${logo.domain}`}
+                  alt={`${logo.name} Logo`}
                   className="w-full h-full object-contain"
+                  loading="lazy"
                 />
               </motion.div>
             ))}

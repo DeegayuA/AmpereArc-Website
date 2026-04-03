@@ -84,10 +84,14 @@ export function Footer() {
 
       <div className="max-w-7xl mx-auto pt-8 border-t border-secondary-foreground/20 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-secondary-foreground/60">
         <p>© 2026 AmpereArc. All rights reserved.</p>
-        <div className="flex gap-6">
+        <div className="flex flex-col md:flex-row gap-6">
           <Link href="#" className="hover:text-white transition-colors">Cookie Policy</Link>
           <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
           <Link href="#" className="hover:text-white transition-colors">General Terms & Conditions (EU)</Link>
+          <p className="text-secondary-foreground/40 hidden md:block">|</p>
+          <Link href="https://github.com/DeegayuA" target="_blank" className="text-primary hover:underline transition-colors lowercase">
+            visit the authoer - github.com/DeegayuA
+          </Link>
         </div>
       </div>
     </footer>

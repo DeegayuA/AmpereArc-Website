@@ -1,72 +1,17 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useMemo } from "react";
 import Image from "next/image";
-
-const categories = ["Home", "Commercial"];
-const subCategories = [
-  "BESS (Battery Energy Storage Systems)",
-  "Inverters",
-  "EV Chargers",
-  "Smart Energy Meters",
-  "Electrical Panel Boards",
-  "Data Loggers",
-  "Home & Industrial Automation"
-];
-
-// Sample grid data
-const gridItems = [
-  {
-    title: "AmpereArc All-In-One",
-    desc: "Seamless integration of battery and inverter.",
-    prevBill: "$250",
-    nowBill: "$40",
-    savings: "84%",
-    className: "col-span-1 md:col-span-1",
-    img: "https://images.unsplash.com/photo-1620714223084-8dfacc6dfd8d?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    title: "Hybrid Inverter XT",
-    desc: "Maximized solar efficiency for larger homes.",
-    prevBill: "$300",
-    nowBill: "$60",
-    savings: "80%",
-    className: "col-span-1 md:col-span-1",
-    img: "https://images.unsplash.com/photo-1508514177221-18d14037b7b2?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    title: "EV Fast Charger",
-    desc: "Power your vehicle from your battery storage.",
-    prevBill: "$150",
-    nowBill: "$20",
-    savings: "86%",
-    className: "col-span-1 md:col-span-1",
-    img: "https://images.unsplash.com/photo-1617788130097-14a95585149a?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    title: "Commercial BESS Stack",
-    desc: "Scalable power for heavy industrial usage.",
-    prevBill: "$2,500",
-    nowBill: "$800",
-    savings: "68%",
-    className: "col-span-1 md:col-span-2",
-    img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    title: "Smart Meter",
-    desc: "Real-time analytics and tariff tracking.",
-    prevBill: "-",
-    nowBill: "-",
-    savings: "Opt.",
-    className: "col-span-1 md:col-span-1",
-    img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop"
-  }
-];
+import { products, categories, subCategories } from "@/lib/data";
 
 export function ProductsBentoGrid() {
   const [activeCat, setActiveCat] = useState("Home");
-  const [activeSub, setActiveSub] = useState("BESS (Battery Energy Storage Systems)");
+  const [activeSub, setActiveSub] = useState("BESS (Battery Energy Storage)");
+
+  const filteredProducts = useMemo(() => {
+    return products.filter(p => p.category === activeCat && p.subCategory === activeSub);
+  }, [activeCat, activeSub]);
 
   return (
     <section id="products" className="py-24 px-6 md:px-12 bg-muted/30">
@@ -112,10 +57,32 @@ export function ProductsBentoGrid() {
           </aside>
 
           {/* Bento Grid */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[25rem]">
-            {gridItems.map((item, i) => (
-              <BentoCard key={i} item={item} />
-            ))}
+          <div className="flex-1 min-h-[500px]">
+             <AnimatePresence mode="wait">
+               {filteredProducts.length > 0 ? (
+                 <motion.div 
+                   key={`${activeCat}-${activeSub}`}
+                   initial={{ opacity: 0, y: 20 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   exit={{ opacity: 0, y: -20 }}
+                   transition={{ duration: 0.4 }}
+                   className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[25rem]"
+                 >
+                   {filteredProducts.map((item) => (
+                     <BentoCard key={item.id} item={item} />
+                   ))}
+                 </motion.div>
+               ) : (
+                 <motion.div 
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   className="h-full flex flex-col items-center justify-center text-center p-12 border-2 border-dashed border-border rounded-3xl"
+                 >
+                   <div className="text-xl font-bold mb-2">No products in this category yet</div>
+                   <p className="text-muted-foreground">We are constantly expanding our portfolio. Check back soon!</p>
+                 </motion.div>
+               )}
+             </AnimatePresence>
           </div>
         </div>
       </div>
@@ -123,13 +90,13 @@ export function ProductsBentoGrid() {
   );
 }
 
-function BentoCard({ item }: { item: typeof gridItems[0] }) {
+function BentoCard({ item }: { item: typeof products[0] }) {
   const [isLoaded, setIsLoaded] = useState(false);
   
   return (
     <motion.div
       whileHover="hover"
-      className={`relative rounded-3xl overflow-hidden bg-card border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.01)] group ${item.className}`}
+      className={`relative rounded-3xl overflow-hidden bg-card border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.01)] group ${item.className || ""}`}
     >
       {/* Skeleton / Fallback BG */}
       <div className={`absolute inset-0 bg-muted animate-pulse ${isLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-500`} />

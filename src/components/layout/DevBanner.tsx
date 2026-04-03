@@ -5,18 +5,10 @@ import { X, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function DevBanner() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const isDismissed = localStorage.getItem("dev-banner-dismissed");
-    if (!isDismissed) {
-      setIsVisible(true);
-    }
-  }, []);
+  const [isVisible, setIsVisible] = useState(true);
 
   const dismiss = () => {
     setIsVisible(false);
-    localStorage.setItem("dev-banner-dismissed", "true");
   };
 
   return (
@@ -26,7 +18,7 @@ export function DevBanner() {
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          className="bg-primary/10 border-b border-primary/20 overflow-hidden relative z-[60]"
+          className="bg-primary/10 border-b border-primary/20 sticky top-0 z-[60] backdrop-blur-md"
         >
           <div className="max-w-7xl mx-auto px-6 py-2 flex items-center justify-center gap-3 text-xs md:text-sm font-medium text-primary">
             <AlertCircle className="w-4 h-4" />

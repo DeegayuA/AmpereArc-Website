@@ -16,9 +16,15 @@ const openSans = Open_Sans({
   subsets: ["latin"],
 });
 
+export const viewport = {
+  themeColor: "#3a3247",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   title: "AmpereArc Energy Storage Systems",
-  description: "Smarter, Greener Energy Storage for a Sustainable Future",
+  description: "Smarter, Greener Energy Storage for a Sustainable Future - Leading the way in battery storage technology.",
 };
 
 export default function RootLayout({
