@@ -62,6 +62,7 @@ export function GlobeSection() {
           </div>
         </div>
 
+{/* 
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-border">
            <div className="pt-8 md:pt-0">
              <div className="text-5xl font-heading font-black text-primary mb-2">00k+</div>
@@ -76,6 +77,7 @@ export function GlobeSection() {
              <div className="text-foreground/70 font-medium tracking-wider uppercase text-sm">CO2 Offset Annually</div>
            </div>
         </div>
+        */}
       </div>
     </section>
   );

@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AmpereArc - Sustainable Energy Solutions
 
-## Getting Started
+AmpereArc is a premium web platform for modern energy infrastructure. Built with cutting-edge technologies, it provides a seamless interface for exploring home and commercial-scale Battery Energy Storage Systems (BESS), Solar Solutions, and EV Infrastructure.
 
-First, run the development server:
+## 🚀 Key Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Dynamic Product Bento Grid**: Highly optimized product exploration with category-based filtering.
+- **Solar Calculator**: Predictive tool for calculating savings and energy ROI.
+- **Real-time Global Visualization**: Integrated world-map tracking sustainable energy impact.
+- **Adaptive Architecture**: High-density design with full Dark Mode support and mobile optimization.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠 Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework**: [Next.js 15 (App Router)](https://nextjs.org/)
+- **UI & Animations**: [Framer Motion](https://www.framer.com/motion/) for fluid transitions.
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with a curated "Dark Gray" palette.
+- **Components**: [Lucide React](https://lucide.dev/) icons, custom SVG Gooey Filters.
+- **State Management**: React Hooks & Context for theme and UI state.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📦 Production Setup
 
-## Learn More
+To run this project in a production environment:
 
-To learn more about Next.js, take a look at the following resources:
+1. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Environment Variables**:
+   Create a `.env.local` file for any API keys (e.g., Maps, Analytics).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **Build for Production**:
+   ```bash
+   npm run build
+   ```
 
-## Deploy on Vercel
+4. **Start Production Server**:
+   ```bash
+   npm run start
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🌐 Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is optimized for deployment on **Vercel** or any Node.js compatible environment.
+
+- **Vercel**: Simply connect the GitHub repository for automatic CI/CD.
+- **Self-Hosting**: Ensure `node` version matches the requirement in `package.json`.
+
+## 📂 Project Structure
+
+- `src/app/`: Next.js App Router pages and layouts.
+- `src/components/`: Modular UI components categorized by section (home, ui, layout).
+- `src/lib/`: Data models, utility functions, and mock databases.
+- `public/`: High-resolution assets including logos and product shots.
+
+---
+© 2026 AmpereArc. All rights reserved.

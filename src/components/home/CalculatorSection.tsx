@@ -13,12 +13,16 @@ export function CalculatorSection() {
   
   // Calculator State
   const [currency, setCurrency] = useState<Currency>("GBP");
-  const [monthlyBill, setMonthlyBill] = useState(100);
+  const [monthlyBill, setMonthlyBill] = useState(150);
   const [hasSolar, setHasSolar] = useState(false);
 
-  // Simple Dummy Logic
-  const savingsPercent = hasSolar ? 0.8 : 0.6;
-  const annualSavings = (monthlyBill * 12 * savingsPercent) * rates[currency];
+  // --- Advanced Logic ---
+  const annualBill = monthlyBill * 12;
+  const savingsFactor = hasSolar ? 0.85 : 0.65; // Optimized for BESS efficacy
+  const annualSavings = annualBill * savingsFactor;
+  const fiveYearSavings = annualSavings * 5.25; // Factoring in grid inflation (approx 5%)
+  const co2SavedPerYear = (annualBill / 0.15) * 0.4; // Extrapolated from kWh/£ logic (~400g per kWh)
+  const treesEquivalent = Math.floor(co2SavedPerYear / 20); // 20kg per tree/year
 
   // --- Canvas Animation ---
   useEffect(() => {
@@ -152,61 +156,118 @@ export function CalculatorSection() {
           </p>
         </div>
 
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="w-full max-w-md bg-background rounded-3xl p-8 shadow-2xl border border-border"
+          className="w-full max-w-[420px] bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
         >
-          <div className="mb-6 flex justify-between items-center">
-            <h3 className="font-bold text-lg font-heading text-foreground">Estimate Savings</h3>
-            <select 
-              value={currency} 
-              onChange={(e) => setCurrency(e.target.value as Currency)}
-              className="bg-muted text-foreground border-none rounded-md px-3 py-1 text-sm outline-none font-bold"
-            >
-              {Object.keys(rates).map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+          <div className="mb-4 flex justify-between items-center bg-white/5 p-3 rounded-2xl border border-white/5">
+            <h3 className="font-bold text-xl font-heading text-background">Impact Analysis</h3>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-background/40 font-bold uppercase tracking-wider">Currency:</span>
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as Currency)}
+                className="bg-primary/20 text-primary border border-primary/20 rounded-lg px-3 py-1.5 text-sm outline-none font-bold hover:bg-primary/30 transition-colors"
+              >
+                {Object.keys(rates).map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
           </div>
 
           <div className="space-y-6">
-            <div>
-               <label className="block text-sm font-medium text-foreground/80 mb-2">
-                 Average Monthly Bill ({symbols[currency]})
-               </label>
-               <input 
-                 type="range" 
-                 min="50" max="1000" step="10"
-                 value={monthlyBill}
-                 onChange={(e) => setMonthlyBill(Number(e.target.value))}
-                 className="w-full accent-primary"
-               />
-               <div className="text-right font-mono font-bold text-primary mt-1">
-                 {symbols[currency]} {Math.round(monthlyBill * rates[currency]).toLocaleString()}
-               </div>
-            </div>
-
-            <div>
-               <label className="block text-sm font-medium text-foreground/80 mb-2 cursor-pointer flex items-center gap-3">
-                 <input 
-                   type="checkbox" 
-                   checked={hasSolar} 
-                   onChange={(e) => setHasSolar(e.target.checked)}
-                   className="w-5 h-5 accent-primary rounded-sm"
-                 />
-                 I already have Solar Panels
-               </label>
-            </div>
-
-            <div className="pt-6 border-t border-border/60">
-              <div className="text-sm text-foreground/60 uppercase font-bold tracking-wider mb-2">Estimated Annual Savings</div>
-              <div className="text-5xl font-black font-heading text-primary">
-                {symbols[currency]} {Math.round(annualSavings).toLocaleString()}
+            {/* Input Slider */}
+            <div className="group">
+              <div className="flex justify-between items-end mb-4">
+                <label className="text-sm font-semibold text-background/60 group-hover:text-primary transition-colors">
+                  Average Monthly Bill
+                </label>
+                <div className="text-2xl font-black font-heading text-primary">
+                  {symbols[currency]} {Math.round(monthlyBill * rates[currency]).toLocaleString()}
+                </div>
+              </div>
+              <div className="relative h-4 w-full bg-white/10 rounded-full mb-2">
+                <motion.div 
+                  className="absolute left-0 top-0 h-full bg-gradient-to-r from-primary/50 to-primary rounded-full"
+                  style={{ width: `${((monthlyBill - 50) / 950) * 100}%` }}
+                />
+                <input
+                  type="range"
+                  min="50" max="1000" step="5"
+                  value={monthlyBill}
+                  onChange={(e) => setMonthlyBill(Number(e.target.value))}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer appearance-none z-20"
+                  style={{ transform: 'scaleY(4)' }}
+                />
+              </div>
+              <div className="flex justify-between text-[10px] text-background/30 font-bold">
+                <span>{symbols[currency]} {Math.round(50 * rates[currency])}</span>
+                <span>{symbols[currency]} {Math.round(1000 * rates[currency])}</span>
               </div>
             </div>
 
-            <button className="w-full bg-foreground text-background py-3 rounded-full font-bold hover:bg-primary hover:text-primary-foreground transition-colors duration-300">
-              Get A Exact Quote
+            {/* Checkbox */}
+            <label className="relative flex items-center p-4 bg-white/5 border border-white/5 rounded-2xl cursor-pointer group hover:bg-white/10 transition-all active:scale-[0.98]">
+              <input
+                type="checkbox"
+                checked={hasSolar}
+                onChange={(e) => setHasSolar(e.target.checked)}
+                className="w-6 h-6 accent-primary rounded-lg border-2 border-primary/50 transition-colors mr-4"
+              />
+              <div className="flex-1">
+                <div className="text-sm font-bold text-background leading-none mb-1">I have solar panels already</div>
+                <div className="text-[11px] text-background/40">use existing solar panel generation in estimate</div>
+              </div>
+              {hasSolar && (
+                <motion.span 
+                  initial={{ scale: 0 }} animate={{ scale: 1 }}
+                  className="bg-primary/20 text-primary text-[10px] font-black px-2 py-1 rounded-md"
+                >
+                  ACTIVE
+                </motion.span>
+              )}
+            </label>
+
+            {/* Results Grid */}
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <div className="bg-white/5 p-4 rounded-3xl border border-white/5">
+                <div className="text-[9px] font-black text-background/30 uppercase tracking-[0.2em] mb-1">Annual Savings</div>
+                <div className="text-2xl font-black font-heading text-primary">
+                  {symbols[currency]}{Math.round(annualSavings * rates[currency]).toLocaleString()}
+                </div>
+              </div>
+              <div className="bg-white/5 p-4 rounded-3xl border border-white/5">
+                <div className="text-[9px] font-black text-background/30 uppercase tracking-[0.2em] mb-1">5-Year Saving</div>
+                <div className="text-2xl font-black font-heading text-background">
+                  {symbols[currency]}{Math.round(fiveYearSavings * rates[currency]).toLocaleString()}
+                </div>
+              </div>
+              <div className="col-span-2 bg-primary group hover:bg-primary/90 transition-colors p-4 rounded-[1.5rem] flex items-center justify-between shadow-xl shadow-primary/20 cursor-pointer">
+                <div>
+                  <div className="text-[9px] font-black text-white/60 uppercase tracking-[0.2em] mb-0.5">Carbon Impact</div>
+                  <div className="text-xl font-black text-white">
+                    {Math.round(co2SavedPerYear).toLocaleString()}kg <span className="text-xs font-medium opacity-60">CO₂ / year</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[9px] font-black text-white/60 uppercase tracking-[0.2em] mb-0.5">Eco Score</div>
+                  <div className="text-xl font-black text-white">
+                    {treesEquivalent} <span className="text-xs font-medium opacity-60">Trees</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => window.location.href = '/contact'}
+              className="relative w-full py-4 rounded-full overflow-hidden group"
+            >
+               <div className="absolute inset-0 bg-background transition-transform duration-500 group-hover:scale-[1.02]" />
+               <div className="absolute inset-x-0 bottom-0 h-1 bg-primary/30" />
+               <span className="relative z-10 font-black text-xs uppercase tracking-[0.3em] text-foreground">
+                 Get a Quote
+               </span>
             </button>
           </div>
         </motion.div>

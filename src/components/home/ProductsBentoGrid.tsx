@@ -9,12 +9,12 @@ import { products, categories, subCategories } from "@/lib/data";
 export function ProductsBentoGrid() {
   const [activeCat, setActiveCat] = useState("Home");
   const [activeSub, setActiveSub] = useState("BESS (Battery Energy Storage)");
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(2);
   const [isMobile, setIsMobile] = useState(false);
 
   // Reset expansion when navigation changes
   useEffect(() => {
-    setIsExpanded(false);
+    setVisibleCount(2);
   }, [activeCat, activeSub]);
 
   // Detect mobile/tablet for progressive disclosure
@@ -58,12 +58,11 @@ export function ProductsBentoGrid() {
   }, [filteredProducts, activeCat, activeSub]);
 
   const displayedProducts = useMemo(() => {
-    if (isMobile && !isExpanded) {
-      // Best SE Practice: Show exactly 4 items (2 rows of 2) for maximum screen density on mobile
-      return gridProducts.slice(0, 4);
+    if (isMobile) {
+      return gridProducts.slice(0, visibleCount);
     }
     return gridProducts;
-  }, [gridProducts, isMobile, isExpanded]);
+  }, [gridProducts, isMobile, visibleCount]);
 
   return (
     <section id="products" className="py-12 px-6 md:px-12 bg-muted/30 scroll-mt-20">
@@ -163,17 +162,24 @@ export function ProductsBentoGrid() {
           </AnimatePresence>
 
           {/* High-Performance Expansion Button */}
-          {isMobile && filteredProducts.length > 4 && (
+          {isMobile && visibleCount < filteredProducts.length && (
             <div className="mt-12 flex justify-center lg:hidden">
               <button
-                onClick={() => setIsExpanded(!isExpanded)}
+                onClick={() => setVisibleCount(prev => prev + 2)}
                 className="group relative inline-flex items-center gap-2 px-8 py-3.5 bg-background border border-border text-foreground text-[10px] font-black uppercase tracking-[0.3em] rounded-full hover:bg-primary hover:text-white hover:border-primary transition-all duration-500 shadow-xl shadow-black/5"
               >
-                {isExpanded ? (
-                  <>Show Less <ChevronUp className="w-3 h-3 group-hover:-translate-y-1 transition-transform" /></>
-                ) : (
-                  <>View Full Collection ({filteredProducts.length}) <ChevronDown className="w-3 h-3 group-hover:translate-y-1 transition-transform" /></>
-                )}
+                View More <ChevronDown className="w-3 h-3 group-hover:translate-y-1 transition-transform" />
+              </button>
+            </div>
+          )}
+
+          {isMobile && visibleCount >= filteredProducts.length && filteredProducts.length > 2 && (
+            <div className="mt-12 flex justify-center lg:hidden">
+              <button
+                onClick={() => setVisibleCount(2)}
+                className="group relative inline-flex items-center gap-2 px-8 py-3.5 bg-background border border-border text-foreground text-[10px] font-black uppercase tracking-[0.3em] rounded-full hover:bg-primary hover:text-white hover:border-primary transition-all duration-500 shadow-xl shadow-black/5"
+              >
+                Show Less <ChevronUp className="w-3 h-3 group-hover:-translate-y-1 transition-transform" />
               </button>
             </div>
           )}
@@ -205,36 +211,56 @@ function BentoCard({ item, index, isMobile }: { item: typeof products[0] & { spa
           alt={item.title}
           fill
           onLoad={() => setIsLoaded(true)}
-          className={`object-cover transition-all duration-1000 ease-out group-hover:scale-105 group-hover:opacity-40 opacity-70 ${isLoaded ? 'blur-0' : 'blur-lg'}`}
+          className={`object-cover transition-all duration-1000 ease-out group-hover:scale-110 opacity-70 group-hover:opacity-50 ${isLoaded ? 'blur-0' : 'blur-lg'}`}
         />
-        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-background via-background/20 to-transparent" />
+        {/* Stronger Bottom-Up Gradient for Readability */}
+        <div className="absolute inset-x-0 bottom-0 h-4/5 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-[1]" />
       </div>
 
       {/* Content Engine */}
       <div className="absolute inset-0 p-4 md:p-8 flex flex-col justify-end z-10">
-        <div className="mb-2 md:mb-5">
+        <div className="mb-3 md:mb-6">
           <motion.h3
-            className="text-sm md:text-2xl font-bold font-heading text-foreground mb-1 md:mb-2 leading-tight group-hover:text-primary transition-colors"
+            className="text-lg md:text-3xl font-bold font-heading text-white mb-1 md:mb-2 leading-tight group-hover:text-primary transition-colors"
           >
             {item.title}
           </motion.h3>
-          <p className="hidden md:block text-foreground/60 text-xs md:text-sm line-clamp-2 md:max-w-[90%] pointer-events-none">
+          <p className="hidden md:block text-white/70 text-xs md:text-sm line-clamp-2 md:max-w-md pointer-events-none mb-4">
             {item.desc}
           </p>
         </div>
 
-        {/* Compressed Savings Stats (Responsive) */}
-        <div className="flex md:grid grid-cols-3 gap-1 md:gap-2 bg-background/50 dark:bg-black/30 backdrop-blur-md rounded-lg md:rounded-2xl p-2 md:p-4 border border-white/5 group-hover:border-primary/20 transition-all">
-          <div className="hidden md:block">
-            <div className="text-[8px] md:text-[9px] text-muted-foreground uppercase font-black tracking-tighter mb-1 opacity-50">Old</div>
-            <div className="font-mono text-[9px] md:text-xs text-foreground/30 line-through">{item.prevBill}</div>
+        {/* Premium Pricing & Savings Module */}
+        <div className="flex flex-col gap-2 md:gap-3 bg-white/5 backdrop-blur-2xl rounded-xl md:rounded-3xl p-3 md:p-6 border border-white/10 group-hover:border-primary/40 transition-all duration-500">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[9px] md:text-xs font-black uppercase tracking-widest text-white/40">Efficiency</span>
+                <span className="h-[1px] w-4 bg-white/20" />
+              </div>
+              <div className="flex items-baseline gap-2 md:gap-4">
+                <span className="text-xl md:text-4xl font-heading font-black text-primary leading-none">
+                  {item.nowBill}
+                </span>
+                <span className="text-sm md:text-xl font-mono text-white/30 line-through decoration-primary/50 decoration-2">
+                  {item.prevBill}
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex flex-col items-end">
+              <div className="text-[9px] md:text-xs font-black uppercase tracking-widest text-primary/80 mb-1">Savings</div>
+              <div className="px-2 md:px-4 py-1 md:py-2 bg-primary text-white text-xs md:text-2xl font-black font-heading rounded-lg md:rounded-xl shadow-lg shadow-primary/20 rotate-1 group-hover:rotate-0 transition-transform">
+                {item.savings}
+              </div>
+            </div>
           </div>
-          <div className="flex-1">
-            <div className="text-[8px] md:text-[9px] text-primary uppercase font-black tracking-tighter mb-0.5 md:mb-1">Save</div>
-            <div className="font-heading font-black text-xs md:text-xl text-primary leading-none">{item.savings}</div>
-          </div>
-          <div className="hidden md:block text-right">
-            <ArrowRight className="inline-block w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-all translate-x-1 group-hover:translate-x-0" />
+          
+          <div className="hidden md:flex items-center justify-between pt-2 border-t border-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+            <span className="text-xs text-white/40 font-medium">Monthly Estimate</span>
+            <div className="flex items-center gap-2 text-primary font-bold text-sm">
+              Explore Specs <ArrowRight className="w-4 h-4" />
+            </div>
           </div>
         </div>
       </div>
