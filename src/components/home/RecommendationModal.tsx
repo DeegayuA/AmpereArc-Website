@@ -15,7 +15,7 @@ interface RecommendationModalProps {
 type Step = "category" | "goal" | "scale" | "result";
 
 export function RecommendationModal({ isOpen, onClose }: RecommendationModalProps) {
-  const { t, formatPrice, currency } = useSettings();
+  const { t, formatPrice, convertPrice, currency } = useSettings();
   const [step, setStep] = useState<Step>("category");
   const [answers, setAnswers] = useState({
     category: "" as "Home" | "Commercial" | "",
@@ -233,7 +233,7 @@ export function RecommendationModal({ isOpen, onClose }: RecommendationModalProp
                         <div className="flex items-center gap-4">
                            <div className="flex flex-col">
                              <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">Est. Price</span>
-                             <span className="text-xl font-black text-primary">{formatPrice(recommendations[0].basePrice, currency)}</span>
+                             <span className="text-xl font-black text-primary">{formatPrice(convertPrice(recommendations[0].basePrice, currency), currency)}</span>
                            </div>
                            <button 
                              onClick={onClose}
