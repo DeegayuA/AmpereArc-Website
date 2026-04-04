@@ -33,13 +33,25 @@ export function LoadingScreen() {
               className="relative flex flex-col items-center gap-4"
             >
               {/* Logo Symbol */}
-              <Image 
-                src="/assets/Logos/AmpereArc-Symbol-CLR.png" 
-                alt="AmpereArc" 
-                width={120} 
-                height={120} 
-                className="object-contain"
-              />
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.05, 1],
+                  opacity: [0.8, 1, 0.8] 
+                }}
+                transition={{ 
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <Image 
+                  src="/assets/Logos/AmpereArc-Symbol-CLR.png" 
+                  alt="AmpereArc" 
+                  width={120} 
+                  height={120} 
+                  className="object-contain"
+                />
+              </motion.div>
               
               {/* Scanning Light Effect */}
               <motion.div 
