@@ -620,7 +620,9 @@ export function RecommendationModal({ isOpen, onClose, quickUsageKwh, quickEvKm 
                     )}
 
                     {/* ── ROOF ── */}
-                    {step==="roof"&&<RoofStep answers={answers} set={set} onBack={()=>go("usage",false)} onNext={()=>go("peak_load")} isCalc={false}/>}
+                    {step==="roof"&&(
+                      <RoofStep answers={answers} set={set} onBack={()=>go("usage",false)} onNext={()=>go("peak_load")} isCalc={isCalc} liveDesign={liveDesign}/>
+                    )}
 
                     {/* ── RESULT ── */}
                     {step==="result"&&(
@@ -737,72 +739,76 @@ function SummaryItem({label, value, sub}: {label: string, value: string, sub: st
   );
 }
 
-function RoofStep({answers,set,onBack,onNext,isCalc}:any){
+function RoofStep({answers,set,onBack,onNext,isCalc,liveDesign}:any){
   const cat = answers.isCommercial?"Commercial":"Home";
-  const wp = cat==="Commercial"?720:500;
   const area = cat==="Commercial"?2.55:2.10;
-  const avgPsh = 5.2;
-  const eff = 0.78;
-  const panelDailyKwh=(wp/1000)*avgPsh*eff;
-  const dailyUsage=answers.monthlyUsageKwh/30;
-  const estPanels=Math.ceil((dailyUsage*(answers.offGrid?1.3:1))/panelDailyKwh);
-  const estRoof=Math.ceil(estPanels*area);
   
-  // Auto-fill logic: if not overridden, use estRoof
+  // Current design panel count from AI Engine
+  const recommendedCount = liveDesign?.panelCount || 0;
+  const currentTotalM2 = Math.ceil(recommendedCount * area);
+
+  // Simple estRoof for slider range
+  const estRoof = Math.ceil((answers.monthlyUsageKwh/30) * 1.5 * area); 
+  const roofArea = answers.roofAreaM2 ?? estRoof;
+  const maxRange = Math.max(estRoof * 3, 400);
+
+  // If the engine had to downsize due to roof, we show warning
+  const isDownsized = liveDesign?.panelCount < Math.ceil((answers.monthlyUsageKwh/30) / (((cat==="Commercial"?720:500)/1000)*5*0.78));
+  const isCritical = recommendedCount === 0;
+
   useEffect(() => {
     if (!answers.roofOverridden && answers.roofAreaM2 === null) {
       set("roofAreaM2", estRoof);
     }
   }, [estRoof, answers.roofOverridden, answers.roofAreaM2, set]);
 
-  const roofArea = answers.roofAreaM2 ?? estRoof;
-  const fittingPanels = Math.max(0, Math.floor(roofArea/area));
-  const maxRange = Math.max(estRoof*2.5, 300);
-
-  const isLow = roofArea < estRoof;
-  const isCritical = fittingPanels === 0;
-
   return(
-    <Wrap title="Roof Capacity" sub="We've estimated the space needed for your goals. Adjust if your roof is smaller or larger." onBack={onBack}>
+    <Wrap title="Roof Capacity" sub="Adjust your available roof space to see how it affects your system size." onBack={onBack}>
       <div className="space-y-6">
-        <div className={`relative overflow-hidden rounded-3xl p-6 border-2 transition-all duration-300 ${isCritical ? "bg-red-500/5 border-red-500/30" : isLow ? "bg-orange-500/5 border-orange-500/30" : "bg-amber-500/5 border-amber-500/20"}`}>
-           <Sun className={`absolute -bottom-4 -right-4 w-24 h-24 rotate-12 transition-colors ${isCritical ? "text-red-500/10" : isLow ? "text-orange-500/10" : "text-amber-500/10"}`}/>
+        <div className={`relative overflow-hidden rounded-[2.5rem] p-9 border-2 transition-all duration-500 ${isCritical ? "bg-red-500/5 border-red-500/30" : isDownsized ? "bg-orange-500/5 border-orange-500/30" : "bg-primary/5 border-primary/20"}`}>
+           <Sun className={`absolute -bottom-6 -right-6 w-32 h-32 rotate-12 transition-colors ${isCritical ? "text-red-500/10" : isDownsized ? "text-orange-500/10" : "text-primary/10"}`}/>
            <div className="relative z-10 flex justify-between items-end">
               <div>
-                <p className={`text-5xl font-black font-heading transition-colors ${isCritical ? "text-red-600" : isLow ? "text-orange-600" : "text-amber-600"}`}>{fittingPanels}</p>
-                <p className="text-xs font-black uppercase text-foreground/40 mt-1">Solar Panels Fit</p>
+                <p className={`text-6xl font-black font-heading transition-colors ${isCritical ? "text-red-600" : isDownsized ? "text-orange-600" : "text-primary"}`}>{recommendedCount}</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 mt-2">Recommended Panels</p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-black">{roofArea} m²</p>
-                <p className="text-xs text-foreground/40">Available Space</p>
+                <p className="text-3xl font-black">{roofArea} m²</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-foreground/30">Available Space</p>
               </div>
            </div>
 
            {/* Warnings */}
-           <div className="mt-4 pt-4 border-t border-current/10">
+           <div className="mt-6 pt-6 border-t border-current/10">
              {isCritical ? (
-               <p className="text-[11px] font-black text-red-600 uppercase tracking-wider flex items-center gap-2">
-                 <X className="w-3 h-3"/> Roof space too small for even one panel
+               <p className="text-[10px] font-black text-red-600 uppercase tracking-widest flex items-center gap-2">
+                 <X className="w-3.5 h-3.5"/> Roof too small for AI system design
                </p>
-             ) : isLow ? (
-               <p className="text-[11px] font-black text-orange-600 uppercase tracking-wider flex items-center gap-2">
-                 <Zap className="w-3 h-3 fill-orange-600"/> System will be downsized to fit your roof
+             ) : isDownsized ? (
+               <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest flex items-center gap-2">
+                 <Zap className="w-3.5 h-3.5 fill-orange-600"/> Downsized to fit your available roof
                </p>
              ) : (
-               <p className="text-[11px] font-black text-emerald-600 uppercase tracking-wider flex items-center gap-2">
-                 <CheckCircle2 className="w-3 h-3"/> Optimal space for your energy goals
+               <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-2">
+                 <CheckCircle2 className="w-3.5 h-3.5"/> Optimal space for your energy goals
                </p>
              )}
            </div>
         </div>
 
-        <input type="range" min={0} max={maxRange} step={5} value={roofArea}
-            onChange={e=>{set("roofAreaM2",parseInt(e.target.value));set("roofOverridden",true);}}
-            className={`w-full accent-amber-500 ${isCritical ? "accent-red-500" : isLow ? "accent-orange-500" : "accent-amber-500"}`}/>
+        <div className="space-y-4">
+          <input type="range" min={0} max={maxRange} step={5} value={roofArea}
+              onChange={e=>{set("roofAreaM2",parseInt(e.target.value));set("roofOverridden",true);}}
+              className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"/>
+          <div className="flex justify-between text-[10px] font-black text-foreground/30 uppercase tracking-[0.2em]">
+            <span>Small Roof</span>
+            <span>Large Factory/Estate</span>
+          </div>
+        </div>
         
         <button onClick={onNext} disabled={isCritical}
           className={`w-full font-black uppercase tracking-widest text-xs py-5 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 disabled:opacity-50 ${isCritical ? "bg-red-500 text-white cursor-not-allowed" : "bg-primary text-white shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]"}`}>
-          {isCritical ? "Roof Not Enough" : <>Continue to Peak Load <ChevronRight className="w-5 h-5"/></>}
+          {isCritical ? "Roof Space Required" : <>Continue to Peak Load <ChevronRight className="w-5 h-5"/></>}
         </button>
       </div>
     </Wrap>

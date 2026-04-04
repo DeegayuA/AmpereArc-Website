@@ -101,22 +101,6 @@ export function SolarWizardResult({
         <p className="text-sm text-foreground/40 font-bold uppercase tracking-[0.1em]">{panelCount} High-Efficiency Panels · {city}, {country.name}</p>
       </div>
 
-      {/* One-Click Contact Row */}
-      <div className="grid grid-cols-4 gap-3">
-        {[
-          { icon: MessageCircle, label: "WhatsApp", color: "bg-[#25D366]", action: shareWA },
-          { icon: Mail, label: "Email", color: "bg-primary", action: shareEmail },
-          { icon: Phone, label: "Call", color: "bg-foreground", action: callBiz },
-          { icon: MessageCircle, label: "SMS", color: "bg-blue-500", action: shareSMS },
-        ].map(b => (
-          <button key={b.label} onClick={b.action} className="group flex flex-col items-center gap-2">
-            <div className={`w-14 h-14 rounded-2xl ${b.color} flex items-center justify-center text-white shadow-lg transition-transform group-active:scale-90`}>
-              <b.icon className="w-6 h-6"/>
-            </div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40">{b.label}</span>
-          </button>
-        ))}
-      </div>
 
       {/* Impact Analysis Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -396,7 +380,7 @@ export function SolarWizardResult({
 
           <div className="pt-8 border-t border-white/10">
              <div className="bg-white/5 rounded-[2rem] p-6 border border-white/5">
-                {!initialName || !initialPhone ? (
+                {!initialName?.trim() || !initialPhone?.trim() ? (
                   <>
                     <h5 className="text-xl font-black font-heading mb-4 text-white">Would you like to install this system?</h5>
                     <p className="text-sm opacity-50 mb-6 text-white">Our technical team will review your local grid conditions and send you a fully itemized official project proposal.</p>
@@ -423,7 +407,7 @@ export function SolarWizardResult({
                   <div className="flex flex-col items-center gap-6">
                     <div className="text-center">
                       <h5 className="text-lg font-black font-heading text-white">Ready for Engineering Review?</h5>
-                      <p className="text-xs opacity-50 mt-1 text-white">Your project will be sent to the AmpereArc technical team now.</p>
+                      <p className="text-xs opacity-50 mt-1 text-white">Your project design is saved. Our technical team will review it shortly.</p>
                     </div>
                     <button 
                       disabled={submitted}
@@ -446,110 +430,119 @@ export function SolarWizardResult({
       </div>
 
       {/* PRINT PROPOSAL LAYOUT (A4) */}
-      <div className="hidden print:block print:fixed print:inset-0 print:bg-white print:z-[9999] print:text-black overflow-hidden font-sans">
-        <div className="p-10 max-w-[210mm] mx-auto bg-white min-h-[297mm] flex flex-col">
+      <div className="print-proposal hidden print:block print:fixed print:inset-0 print:bg-white print:z-[9999] print:text-black overflow-hidden font-sans">
+        <div className="p-10 max-w-[210mm] mx-auto bg-white min-h-[297mm] flex flex-col items-stretch">
           {/* A4 Header */}
-          <div className="flex justify-between items-start border-b-2 border-primary/20 pb-8 mb-10">
+          <div className="flex justify-between items-start border-b-4 border-black pb-8 mb-10">
             <div>
-               <h1 className="text-4xl font-black font-heading text-primary tracking-tighter">AmpereArc</h1>
-               <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mt-1">Solar Solution Proposal</p>
+               <h1 className="text-4xl font-black font-heading text-black tracking-tighter">AmpereArc</h1>
+               <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-60 mt-1 text-black">Solar Energy Project Proposal</p>
             </div>
             <div className="text-right">
-               <p className="text-xs font-bold uppercase tracking-widest leading-loose">Project ID: ARC-{Math.random().toString(36).substr(2,6).toUpperCase()}</p>
-               <p className="text-xs opacity-50">{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+               <p className="text-xs font-black uppercase tracking-widest leading-loose">Project ID: ARC-{Math.random().toString(36).substr(2,6).toUpperCase()}</p>
+               <p className="text-xs font-bold opacity-60">{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-12 mb-12">
             <div className="space-y-4">
-               <div>
+               <div className="border-l-2 border-black/10 pl-4">
                   <h4 className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Project Site</h4>
                   <p className="text-lg font-black">{city}, {country.name}</p>
                </div>
-               <div>
+               <div className="border-l-2 border-black/10 pl-4">
                   <h4 className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Customer Name</h4>
                   <p className="text-lg font-black">{name || "Valued Customer"}</p>
                </div>
-               <div>
-                  <h4 className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Status</h4>
-                  <p className="text-xs font-bold text-emerald-600">Calculated • Ready for Installation</p>
+               <div className="border-l-2 border-black/10 pl-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Proposed Capacity</h4>
+                  <p className="text-lg font-black">{systemKwp} kWp Yielding</p>
                </div>
             </div>
-            <div className="bg-primary/5 rounded-3xl p-6 border border-primary/10">
-               <h4 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4 text-center">Net Final Investment</h4>
-               <p className="text-5xl font-black font-heading text-center text-primary">{fmtUsd(costBreakdown.discountedTotal)}</p>
-               <div className="mt-4 grid grid-cols-2 gap-4 border-t border-primary/20 pt-4">
-                  <div className="text-center">
-                     <p className="text-[9px] font-black opacity-40 uppercase">Break-even</p>
-                     <p className="text-sm font-black">{breakEvenYears} Years</p>
+            <div className="bg-white border-4 border-black rounded-3xl p-8 flex flex-col justify-center">
+               <h4 className="text-[11px] font-black uppercase tracking-widest text-black mb-4 text-center">Net Final Investment</h4>
+               <p className="text-5xl font-black font-heading text-center text-black">{fmtUsd(costBreakdown.discountedTotal)}</p>
+               <div className="mt-6 grid grid-cols-2 gap-4 border-t-2 border-black/10 pt-6">
+                  <div className="text-center font-black">
+                     <p className="text-[9px] opacity-40 uppercase tracking-tighter">ROI Period</p>
+                     <p className="text-base">{breakEvenYears} Years</p>
                   </div>
-                  <div className="text-center">
-                     <p className="text-[9px] font-black opacity-40 uppercase">25-Year Saving</p>
-                     <p className="text-sm font-black">{fmtUsd(lifetimeSavings25Yr)}</p>
+                  <div className="text-center font-black">
+                     <p className="text-[9px] opacity-40 uppercase tracking-tighter">Life Profit</p>
+                     <p className="text-base">{fmtUsd(lifetimeSavings25Yr)}</p>
                   </div>
                </div>
             </div>
           </div>
 
           <div className="mb-12">
-             <h3 className="text-xl font-black font-heading mb-6 border-l-4 border-primary pl-4 uppercase tracking-widest">Hardware Configuration</h3>
+             <h3 className="text-xl font-black font-heading mb-6 border-b-2 border-black pb-2 uppercase tracking-widest">Hardware Configuration</h3>
              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <PrintStat label="Panels" value={`${panelCount} Units`} sub={panels.product.title}/>
-                <PrintStat label="Inverter" value={`${inverters.count} Hybrid`} sub={inverters.product.title}/>
-                {batteries && <PrintStat label="BESS Storage" value={batteries.product.metadata.kwh + "kWh"} sub={batteries.product.title}/>}
-                <PrintStat label="Capacity" value={systemKwp + " kWp"} sub="Peak Power"/>
+                <PrintStat label="Solar Units" value={`${panelCount} High-Efficiency`} sub={panels.product.title}/>
+                <PrintStat label="Inverter" value={`${inverters.count}x Multi-Phase`} sub={inverters.product.title}/>
+                {batteries && <PrintStat label="Storage" value={batteries.product.metadata.kwh + "kWh BESS"} sub={batteries.product.title}/>}
+                <PrintStat label="Grid Configuration" value={offGrid ? "Off-Grid System" : "Grid-Tied Design"} sub={`${country.name} Standard`}/>
              </div>
           </div>
 
-          <div className="mb-12">
-             <h3 className="text-xl font-black font-heading mb-6 border-l-4 border-primary pl-4 uppercase tracking-widest">Monthly Energy Forecast</h3>
-             <div className="h-64 flex items-end justify-between gap-2 px-4 border-b border-border/50">
+          <div className="mb-12 flex-1">
+             <h3 className="text-xl font-black font-heading mb-6 border-b-2 border-black pb-2 uppercase tracking-widest">Monthly Energy Forecast</h3>
+             <div className="h-64 flex items-end justify-between gap-1 px-4 border-b-2 border-black">
                {monthly.map(m => (
-                 <div key={m.month} className="flex-1 flex flex-col items-center group">
-                   <div className="w-full bg-primary/20 rounded-t-lg transition-all" style={{ height: `${(m.generationKwh / maxGen) * 100}%` }} />
-                   <span className="text-[9px] font-black uppercase tracking-tighter mt-2 mt-2">{m.month}</span>
+                 <div key={m.month} className="flex-1 flex flex-col items-center">
+                   <div className="w-full bg-black/10 border-x border-t border-black/20 rounded-t-sm" style={{ height: `${(m.generationKwh / maxGen) * 100}%` }} />
+                   <span className="text-[10px] font-black uppercase mt-2">{m.month.substr(0,1)}</span>
                  </div>
                ))}
              </div>
-             <p className="text-[10px] opacity-40 mt-4 italic text-center">Solar irradiation model based on historical local data for {city}. Efficiency losses: 22% expected.</p>
+             <p className="text-[9px] opacity-40 mt-4 italic text-center font-bold uppercase tracking-widest">This forecast uses PVSYST model for {city} irradiance. Transmission efficiency @ 78%.</p>
           </div>
 
            {/* Cost Table for Print */}
-           <div className="mb-12">
-              <h3 className="text-xl font-black font-heading mb-6 border-l-4 border-primary pl-4 uppercase tracking-widest">Itemized Project Breakdown</h3>
+           <div className="mb-8 page-break-before-always">
+              <h3 className="text-xl font-black font-heading mb-6 border-b-2 border-black pb-2 uppercase tracking-widest">Project Bill of Materials</h3>
               <table className="w-full text-left">
-                <thead className="border-b-2 border-primary/20">
+                <thead className="border-b-2 border-black">
                   <tr>
                     <th className="py-3 text-[10px] font-black uppercase tracking-widest">Description</th>
-                    <th className="py-3 text-[10px] font-black uppercase tracking-widest text-right">Unit Price</th>
-                    <th className="py-3 text-[10px] font-black uppercase tracking-widest text-right">Quantity</th>
-                    <th className="py-3 text-[10px] font-black uppercase tracking-widest text-right">Subtotal</th>
+                    <th className="py-3 text-[10px] font-black uppercase tracking-widest text-right">Qty</th>
+                    <th className="py-3 text-[10px] font-black uppercase tracking-widest text-right">Amount</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/50">
+                <tbody className="divide-y-2 divide-black/5 font-bold">
                    <PrintRow label={panels.product.title} price={fmtUsd(panels.discountedUnitPriceUsd)} qty={panelCount} total={fmtUsd(panels.discountedTotalUsd)}/>
                    <PrintRow label={inverters.product.title} price={fmtUsd(inverters.discountedUnitPriceUsd)} qty={inverters.count} total={fmtUsd(inverters.discountedTotalUsd)}/>
                    {batteries && <PrintRow label={batteries.product.title} price={fmtUsd(batteries.discountedUnitPriceUsd)} qty={batteries.count} total={fmtUsd(batteries.discountedTotalUsd)}/>}
                    {evCharger && <PrintRow label={evCharger.product.title} price={fmtUsd(evCharger.discountedUnitPriceUsd)} qty={evCharger.count} total={fmtUsd(evCharger.discountedTotalUsd)}/>}
-                   <PrintRow label="Professional Installation & Labour" price="N/A" qty="Project" total={fmtUsd(costBreakdown.installation)}/>
-                   <PrintRow label="BOS (Cabling, Racking, Switchgear)" price="N/A" qty="Fixed" total={fmtUsd(costBreakdown.bos)}/>
+                   <PrintRow label="Professional Installation & Smart Certification" price="N/A" qty="1" total={fmtUsd(costBreakdown.installation)}/>
+                   <PrintRow label="Balance of Systems (Wiring, Racking, Safety Switchgear)" price="N/A" qty="1" total={fmtUsd(costBreakdown.bos)}/>
+                   <tr className="border-t-4 border-black font-black">
+                      <td colSpan={2} className="py-6 text-right uppercase tracking-[0.3em]">Net Proposal Total</td>
+                      <td className="py-6 text-right text-lg">{fmtUsd(costBreakdown.discountedTotal)}</td>
+                   </tr>
                 </tbody>
               </table>
            </div>
 
-           <div className="mt-auto border-t border-border/50 pt-8 flex justify-between items-center text-[10px] font-bold opacity-30 uppercase tracking-[0.2em]">
-              <p>Generated by AmpereArc AI Design Engine</p>
-              <p>Proposal Valid for 14 Days</p>
+           <div className="mt-auto border-t-2 border-black pt-10 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em]">
+              <p>© AmpereArc Engineering Design Studio</p>
+              <p>Quote Validity: 14 Days from Generation</p>
            </div>
         </div>
       </div>
 
        <style jsx global>{`
         @media print {
-          body * { visibility: hidden; }
-          .print-proposal, .print-proposal * { visibility: visible; }
-          .print-proposal { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
-          @page { size: A4; margin: 0; }
+          .no-print { display: none !important; }
+          body { background: white !important; margin: 0; padding: 0; }
+          body > * { display: none !important; }
+          .print-proposal { 
+            display: block !important; 
+            position: relative !important; 
+            visibility: visible !important;
+            width: 100% !important;
+          }
+          @page { size: A4; margin: 15mm; }
         }
       `}</style>
     </div>
@@ -558,10 +551,10 @@ export function SolarWizardResult({
 
 function PrintStat({label, value, sub}: any) {
   return (
-    <div className="p-4 rounded-2xl border border-primary/10 bg-primary/5">
-       <p className="text-[10px] font-black uppercase opacity-40 mb-1">{label}</p>
-       <p className="text-sm font-black">{value}</p>
-       <p className="text-[10px] opacity-40 truncate">{sub}</p>
+    <div className="p-4 rounded-2xl border-2 border-black/10 bg-white">
+       <p className="text-[10px] font-black uppercase opacity-60 mb-1">{label}</p>
+       <p className="text-sm font-black text-black">{value}</p>
+       <p className="text-[10px] opacity-60 truncate">{sub}</p>
     </div>
   );
 }
@@ -569,10 +562,9 @@ function PrintStat({label, value, sub}: any) {
 function PrintRow({label, price, qty, total}: any) {
   return (
     <tr>
-      <td className="py-4 text-xs font-black">{label}</td>
-      <td className="py-4 text-xs text-right opacity-60 font-medium">{price}</td>
-      <td className="py-4 text-xs text-right font-black">{qty}</td>
-      <td className="py-4 text-xs text-right font-black">{total}</td>
+      <td className="py-4 text-xs font-black text-black">{label}</td>
+      <td className="py-4 text-xs text-right text-black font-black whitespace-nowrap">{qty}</td>
+      <td className="py-4 text-xs text-right font-black text-black">{total}</td>
     </tr>
   );
 }
