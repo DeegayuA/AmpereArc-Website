@@ -70,7 +70,7 @@ export function Hero() {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative w-full h-screen min-h-[800px] overflow-hidden flex flex-col justify-end bg-background"
+      className="relative w-full h-[calc(100vh-112px)] min-h-[700px] overflow-hidden flex flex-col justify-end bg-background"
     >
       {/* Background Image with Mask */}
       <div className="absolute inset-0 z-0 bg-muted/20">

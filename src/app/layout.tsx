@@ -65,9 +65,7 @@ export default function RootLayout({
             <DevBanner />
             <Header />
           </div>
-          <PageTransition>
-            <main className="flex-1 overflow-x-hidden pt-28">{children}</main>
-          </PageTransition>
+          <main className="flex-1 overflow-x-hidden pt-28">{children}</main>
           <Footer />
         </Providers>
       </body>

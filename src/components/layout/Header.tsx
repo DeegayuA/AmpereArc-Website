@@ -29,10 +29,10 @@ export function Header() {
   });
 
   const links = [
-    { name: t.nav.products, href: "#products" },
-    { name: t.nav.blog, href: "#" },
-    { name: t.nav.caseStudies, href: "#" },
-    { name: t.nav.portal, href: "#" },
+    { name: t.nav.products, href: "/products" },
+    { name: t.nav.blog, href: "/blog" },
+    { name: t.nav.caseStudies, href: "/case-studies" },
+    { name: t.nav.portal, href: "/portal" },
   ];
 
   const solutions = [
