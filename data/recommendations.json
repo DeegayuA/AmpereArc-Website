@@ -190,5 +190,40 @@
       "instantPeakKw": 4,
       "usageMode": "units"
     }
+  },
+  {
+    "id": "AA-1775296058774-820",
+    "timestamp": "2026-04-04T09:47:38.774Z",
+    "contact": {
+      "name": "r",
+      "phone": "rr",
+      "email": ""
+    },
+    "location": {
+      "city": "Colombo",
+      "country": "LK"
+    },
+    "answers": {
+      "isCommercial": false,
+      "isThreePhase": false,
+      "monthlyUsageKwh": 584,
+      "needsBackup": false,
+      "backupHours": 8,
+      "goalMaxIncome": false,
+      "offGrid": false,
+      "needsEV": false,
+      "evChargingKw": 7,
+      "evKmPerDay": 40,
+      "name": "r",
+      "phone": "rr",
+      "email": "",
+      "city": "Colombo",
+      "countryCode": "LK",
+      "roofAreaM2": 21,
+      "roofOverridden": false,
+      "instantPeakKw": 2,
+      "usageMode": "units",
+      "selectedBatteryId": ""
+    }
   }
 ]

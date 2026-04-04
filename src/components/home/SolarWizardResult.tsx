@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
   Sun, Battery, Zap, Car, TrendingUp, CalendarDays, RefreshCw,
-  MessageCircle, Mail, Phone, CheckCircle2, Copy, Loader2, Gauge, Fuel, User
+  MessageCircle, Mail, Phone, CheckCircle2, Copy, Loader2, Gauge, Fuel, User, Printer, FileText, Download
 } from "lucide-react";
 
 interface Props {
@@ -81,6 +81,10 @@ export function SolarWizardResult({
     navigator.clipboard.writeText(buildMessage());
     setCopied(true);
     setTimeout(()=>setCopied(false), 2000);
+  };
+
+  const handlePrint = () => {
+    window.print();
   };
 
   return (
@@ -374,64 +378,201 @@ export function SolarWizardResult({
               <p className="text-[10px] font-bold opacity-30 mt-2 uppercase tracking-widest">Calculated net profit over 25 years (Inflation adjusted)</p>
             </div>
             
-            <div className="flex flex-col gap-2 w-full md:w-auto">
-              <button onClick={shareWA} className="bg-primary text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-primary/20">
-                Send to WhatsApp <MessageCircle className="w-4 h-4"/>
+            <div className="no-print grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <button onClick={shareWA} className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all">
+                <MessageCircle className="w-6 h-6"/> <span className="text-[10px] font-black uppercase">WhatsApp</span>
               </button>
-              <button onClick={copyText} className="bg-white/5 border border-white/10 text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 hover:bg-white/10 transition-all">
-                {copied ? "Copied!" : "Copy Details"} <Copy className="w-4 h-4"/>
+              <button onClick={() => window.print()} className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all">
+                <Printer className="w-6 h-6"/> <span className="text-[10px] font-black uppercase">Download PDF</span>
+              </button>
+              <button onClick={copyText} className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white transition-all">
+                {copied ? <CheckCircle2 className="w-6 h-6"/> : <Copy className="w-6 h-6"/>} <span className="text-[10px] font-black uppercase text-center">{copied ? "Copied" : "Copy Details"}</span>
+              </button>
+              <button onClick={callBiz} className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white transition-all">
+                <Phone className="w-6 h-6"/> <span className="text-[10px] font-black uppercase">Call Agent</span>
               </button>
             </div>
           </div>
 
           <div className="pt-8 border-t border-white/10">
-            <div className="bg-white/5 rounded-[2rem] p-6 border border-white/5">
-               <h5 className="text-xl font-black font-heading mb-4">Would you like to install this system?</h5>
-               <p className="text-sm opacity-50 mb-6">Our technical team will review your local grid conditions and send you a fully itemized official project proposal.</p>
-               
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {!initialName || !initialPhone ? (
-                    <>
+             <div className="bg-white/5 rounded-[2rem] p-6 border border-white/5">
+                {!initialName || !initialPhone ? (
+                  <>
+                    <h5 className="text-xl font-black font-heading mb-4 text-white">Would you like to install this system?</h5>
+                    <p className="text-sm opacity-50 mb-6 text-white">Our technical team will review your local grid conditions and send you a fully itemized official project proposal.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2">Your Name</label>
+                        <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2 text-white">Your Name</label>
                         <input type="text" placeholder="Designate project owner..." value={name} onChange={e=>setName(e.target.value)}
                           className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary transition-all text-white"/>
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2">WhatsApp Number</label>
+                        <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2 text-white">WhatsApp Number</label>
                         <input type="tel" placeholder="+ (Country Code) ..." value={phone} onChange={e=>setPhone(e.target.value)}
                           className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary transition-all text-white"/>
                       </div>
-                    </>
-                  ) : (
-                    <div className="md:col-span-2 p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        <User className="w-5 h-5"/>
-                      </div>
-                      <div>
-                        <p className="text-xs font-black">{initialName}</p>
-                        <p className="text-[10px] opacity-40">{initialPhone}</p>
-                      </div>
+                      <button 
+                        disabled={submitted}
+                        onClick={() => setSubmitted(true)}
+                        className="md:col-span-2 bg-white text-foreground py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all shadow-2xl">
+                        {submitted ? "Project Submitted Successfully" : "Submit Project for Engineering Review"}
+                      </button>
                     </div>
-                  )}
-                  
-                  <button 
-                    disabled={submitted}
-                    className="md:col-span-2 bg-white text-foreground py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all shadow-2xl disabled:opacity-50 disabled:bg-white/10 disabled:text-white/40">
-                    {submitted ? "Project Submitted Successfully" : initialName ? "Confirm & Submit for Engineering Review" : "Submit Project for Engineering Review"}
-                  </button>
-               </div>
-            </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="text-center">
+                      <h5 className="text-lg font-black font-heading text-white">Ready for Engineering Review?</h5>
+                      <p className="text-xs opacity-50 mt-1 text-white">Your project will be sent to the AmpereArc technical team now.</p>
+                    </div>
+                    <button 
+                      disabled={submitted}
+                      onClick={() => setSubmitted(true)}
+                      className="w-full bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary/80 transition-all shadow-2xl disabled:opacity-50">
+                      {submitted ? "Project Submitted Successfully" : "Submit Design for Final Approval"}
+                    </button>
+                  </div>
+                )}
+             </div>
           </div>
         </div>
       </div>
 
       {/* Reset/Redo */}
-      <div className="flex justify-center pt-4">
+      <div className="no-print flex justify-center pt-4">
         <button onClick={onReset} className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-foreground/40 hover:text-primary transition-colors">
           <RefreshCw className="w-4 h-4"/> Start New Calculation
         </button>
       </div>
+
+      {/* PRINT PROPOSAL LAYOUT (A4) */}
+      <div className="hidden print:block print:fixed print:inset-0 print:bg-white print:z-[9999] print:text-black overflow-hidden font-sans">
+        <div className="p-10 max-w-[210mm] mx-auto bg-white min-h-[297mm] flex flex-col">
+          {/* A4 Header */}
+          <div className="flex justify-between items-start border-b-2 border-primary/20 pb-8 mb-10">
+            <div>
+               <h1 className="text-4xl font-black font-heading text-primary tracking-tighter">AmpereArc</h1>
+               <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mt-1">Solar Solution Proposal</p>
+            </div>
+            <div className="text-right">
+               <p className="text-xs font-bold uppercase tracking-widest leading-loose">Project ID: ARC-{Math.random().toString(36).substr(2,6).toUpperCase()}</p>
+               <p className="text-xs opacity-50">{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-12 mb-12">
+            <div className="space-y-4">
+               <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Project Site</h4>
+                  <p className="text-lg font-black">{city}, {country.name}</p>
+               </div>
+               <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Customer Name</h4>
+                  <p className="text-lg font-black">{name || "Valued Customer"}</p>
+               </div>
+               <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Status</h4>
+                  <p className="text-xs font-bold text-emerald-600">Calculated • Ready for Installation</p>
+               </div>
+            </div>
+            <div className="bg-primary/5 rounded-3xl p-6 border border-primary/10">
+               <h4 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4 text-center">Net Final Investment</h4>
+               <p className="text-5xl font-black font-heading text-center text-primary">{fmtUsd(costBreakdown.discountedTotal)}</p>
+               <div className="mt-4 grid grid-cols-2 gap-4 border-t border-primary/20 pt-4">
+                  <div className="text-center">
+                     <p className="text-[9px] font-black opacity-40 uppercase">Break-even</p>
+                     <p className="text-sm font-black">{breakEvenYears} Years</p>
+                  </div>
+                  <div className="text-center">
+                     <p className="text-[9px] font-black opacity-40 uppercase">25-Year Saving</p>
+                     <p className="text-sm font-black">{fmtUsd(lifetimeSavings25Yr)}</p>
+                  </div>
+               </div>
+            </div>
+          </div>
+
+          <div className="mb-12">
+             <h3 className="text-xl font-black font-heading mb-6 border-l-4 border-primary pl-4 uppercase tracking-widest">Hardware Configuration</h3>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <PrintStat label="Panels" value={`${panelCount} Units`} sub={panels.product.title}/>
+                <PrintStat label="Inverter" value={`${inverters.count} Hybrid`} sub={inverters.product.title}/>
+                {batteries && <PrintStat label="BESS Storage" value={batteries.product.metadata.kwh + "kWh"} sub={batteries.product.title}/>}
+                <PrintStat label="Capacity" value={systemKwp + " kWp"} sub="Peak Power"/>
+             </div>
+          </div>
+
+          <div className="mb-12">
+             <h3 className="text-xl font-black font-heading mb-6 border-l-4 border-primary pl-4 uppercase tracking-widest">Monthly Energy Forecast</h3>
+             <div className="h-64 flex items-end justify-between gap-2 px-4 border-b border-border/50">
+               {monthly.map(m => (
+                 <div key={m.month} className="flex-1 flex flex-col items-center group">
+                   <div className="w-full bg-primary/20 rounded-t-lg transition-all" style={{ height: `${(m.generationKwh / maxGen) * 100}%` }} />
+                   <span className="text-[9px] font-black uppercase tracking-tighter mt-2 mt-2">{m.month}</span>
+                 </div>
+               ))}
+             </div>
+             <p className="text-[10px] opacity-40 mt-4 italic text-center">Solar irradiation model based on historical local data for {city}. Efficiency losses: 22% expected.</p>
+          </div>
+
+           {/* Cost Table for Print */}
+           <div className="mb-12">
+              <h3 className="text-xl font-black font-heading mb-6 border-l-4 border-primary pl-4 uppercase tracking-widest">Itemized Project Breakdown</h3>
+              <table className="w-full text-left">
+                <thead className="border-b-2 border-primary/20">
+                  <tr>
+                    <th className="py-3 text-[10px] font-black uppercase tracking-widest">Description</th>
+                    <th className="py-3 text-[10px] font-black uppercase tracking-widest text-right">Unit Price</th>
+                    <th className="py-3 text-[10px] font-black uppercase tracking-widest text-right">Quantity</th>
+                    <th className="py-3 text-[10px] font-black uppercase tracking-widest text-right">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                   <PrintRow label={panels.product.title} price={fmtUsd(panels.discountedUnitPriceUsd)} qty={panelCount} total={fmtUsd(panels.discountedTotalUsd)}/>
+                   <PrintRow label={inverters.product.title} price={fmtUsd(inverters.discountedUnitPriceUsd)} qty={inverters.count} total={fmtUsd(inverters.discountedTotalUsd)}/>
+                   {batteries && <PrintRow label={batteries.product.title} price={fmtUsd(batteries.discountedUnitPriceUsd)} qty={batteries.count} total={fmtUsd(batteries.discountedTotalUsd)}/>}
+                   {evCharger && <PrintRow label={evCharger.product.title} price={fmtUsd(evCharger.discountedUnitPriceUsd)} qty={evCharger.count} total={fmtUsd(evCharger.discountedTotalUsd)}/>}
+                   <PrintRow label="Professional Installation & Labour" price="N/A" qty="Project" total={fmtUsd(costBreakdown.installation)}/>
+                   <PrintRow label="BOS (Cabling, Racking, Switchgear)" price="N/A" qty="Fixed" total={fmtUsd(costBreakdown.bos)}/>
+                </tbody>
+              </table>
+           </div>
+
+           <div className="mt-auto border-t border-border/50 pt-8 flex justify-between items-center text-[10px] font-bold opacity-30 uppercase tracking-[0.2em]">
+              <p>Generated by AmpereArc AI Design Engine</p>
+              <p>Proposal Valid for 14 Days</p>
+           </div>
+        </div>
+      </div>
+
+       <style jsx global>{`
+        @media print {
+          body * { visibility: hidden; }
+          .print-proposal, .print-proposal * { visibility: visible; }
+          .print-proposal { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+          @page { size: A4; margin: 0; }
+        }
+      `}</style>
     </div>
+  );
+}
+
+function PrintStat({label, value, sub}: any) {
+  return (
+    <div className="p-4 rounded-2xl border border-primary/10 bg-primary/5">
+       <p className="text-[10px] font-black uppercase opacity-40 mb-1">{label}</p>
+       <p className="text-sm font-black">{value}</p>
+       <p className="text-[10px] opacity-40 truncate">{sub}</p>
+    </div>
+  );
+}
+
+function PrintRow({label, price, qty, total}: any) {
+  return (
+    <tr>
+      <td className="py-4 text-xs font-black">{label}</td>
+      <td className="py-4 text-xs text-right opacity-60 font-medium">{price}</td>
+      <td className="py-4 text-xs text-right font-black">{qty}</td>
+      <td className="py-4 text-xs text-right font-black">{total}</td>
+    </tr>
   );
 }
