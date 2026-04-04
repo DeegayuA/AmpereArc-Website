@@ -202,9 +202,9 @@ export const products: Product[] = [
     metadata: { chargingKw: 11, phases: 3, minHomePhasesRequired: 3 }
   },
   {
-    id: "ev-22kw",
-    title: "AmpereArc 22kW Smart EV Charger",
-    desc: "High-speed charging station with OCPP 1.6J support. Requires three-phase home supply. Charges most EVs in under 2 hours.",
+    id: "ev-40kw",
+    title: "AmpereArc 40kW DC EV Charger",
+    desc: "High-speed DC fast charging station with OCPP 1.6J support. Requires three-phase supply. Charges most EVs in under 2 hour.",
     category: "Home",
     subCategory: "EV Chargers",
     basePrice: 580,
@@ -212,7 +212,7 @@ export const products: Product[] = [
     img: "/assets/Products/AI-EV_Charger_7kw-22kw.png",
     className: "md:col-span-1 md:row-span-1",
     tags: ["ev", "three-phase", "ultra-fast"],
-    metadata: { chargingKw: 22, phases: 3, minHomePhasesRequired: 3 }
+    metadata: { chargingKw: 40, phases: 3, minHomePhasesRequired: 3 }
   },
   {
     id: "c-ev-22kw-3ph",
