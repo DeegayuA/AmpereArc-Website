@@ -28,8 +28,8 @@ export const metadata: Metadata = {
   description: "Smarter, Greener Energy Storage for a Sustainable Future - Leading the way in battery storage technology.",
 };
 
-import { LoadingScreen } from "@/components/ui/LoadingScreen";
-import { PageTransition } from "@/components/providers/PageTransition";
+import { RecommendationModal } from "@/components/home/RecommendationModal";
+import { useModal } from "@/components/providers/ModalProvider";
 
 export default function RootLayout({
   children,
@@ -67,8 +67,19 @@ export default function RootLayout({
           </div>
           <main className="flex-1 overflow-x-hidden pt-28">{children}</main>
           <Footer />
+          <ModalContainer />
         </Providers>
       </body>
     </html>
+  );
+}
+
+function ModalContainer() {
+  const { isRecommendationOpen, setRecommendationOpen } = useModal();
+  return (
+    <RecommendationModal 
+      isOpen={isRecommendationOpen} 
+      onClose={() => setRecommendationOpen(false)} 
+    />
   );
 }

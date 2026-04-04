@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { RecommendationModal } from "./RecommendationModal";
+import { useModal } from "@/components/providers/ModalProvider";
 
 const backgrounds = {
   home: "/assets/Hero_BG/home.png",
@@ -17,7 +17,7 @@ export function Hero() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [isRecommendationOpen, setIsRecommendationOpen] = useState(false);
+  const { setRecommendationOpen } = useModal();
 
   // Auto-advance logic
   useEffect(() => {
@@ -70,7 +70,7 @@ export function Hero() {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative w-full h-[calc(100vh-112px)] min-h-[700px] overflow-hidden flex flex-col justify-end bg-background"
+      className="relative w-full h-[calc(100vh-112px)] min-h-[500px] overflow-hidden flex flex-col justify-end bg-background"
     >
       {/* Background Image with Mask */}
       <div className="absolute inset-0 z-0 bg-muted/20">
@@ -138,7 +138,7 @@ export function Hero() {
           >
             {/* Primary Button */}
             <button 
-              onClick={() => setIsRecommendationOpen(true)}
+              onClick={() => setRecommendationOpen(true)}
               className="group relative inline-flex items-center justify-center p-1 rounded-sm bg-foreground text-background font-bold tracking-wider uppercase text-sm overflow-hidden h-[54px] pr-6 pl-1 decoration-transparent"
             >
               {/* Dot Grid Box */}
@@ -195,11 +195,6 @@ export function Hero() {
           progress={bg === "installer" ? progress : 0}
         />
       </div>
-
-      <RecommendationModal 
-        isOpen={isRecommendationOpen} 
-        onClose={() => setIsRecommendationOpen(false)} 
-      />
     </section>
   );
 }
