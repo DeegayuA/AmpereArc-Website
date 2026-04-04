@@ -292,8 +292,12 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
                       <Wrap title="Range & EV Charging" sub="Include smart EV charging in your design." onBack={()=>go("goal",false)}>
                         <div className="space-y-6">
                           <Grid2>
-                            <Card icon={Car} title="Add Smart EV Charger" desc="Charge for free via Solar" selected={answers.needsEV} onClick={()=>set("needsEV",true)}/>
-                            <Card icon={Car} title="Skip EV Charging" desc="Continue without EV hardware" selected={!answers.needsEV} onClick={()=>{set("needsEV",false);go("location");}}/>
+                            <Card icon={Car} title="Add Smart EV Charger" desc="Charge for free via Solar" 
+                              note="Includes smart solar-sync hardware"
+                              selected={answers.needsEV} onClick={()=>set("needsEV",true)}/>
+                            <Card icon={Car} title="Skip EV Charging" desc="Continue without EV hardware" 
+                              note="You can add this later"
+                              selected={!answers.needsEV} onClick={()=>{set("needsEV",false);go("location");}}/>
                           </Grid2>
                           {answers.needsEV && (
                             <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} className="space-y-4 pt-4 border-t border-border/50">
