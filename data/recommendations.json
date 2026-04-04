@@ -1,0 +1,59 @@
+[
+  {
+    "id": "AA-1775285573358-378",
+    "timestamp": "2026-04-04T06:52:53.358Z",
+    "contact": {
+      "name": "Test User",
+      "phone": "+94777123456",
+      "email": "",
+      "address": ""
+    },
+    "location": {
+      "city": "Colombo",
+      "country": "LK"
+    },
+    "system": {
+      "kWp": 2,
+      "panels": "5× AmpereArc 400W Monocrystalline Panel",
+      "inverters": "1× AmpereArc 10kW Hybrid Inverter",
+      "batteries": "1× AmpereArc 16.8kWh High-Capacity Battery",
+      "evCharger": null,
+      "totalCostUsd": 10712.5,
+      "annualSavingsUsd": 450.98,
+      "breakEvenYears": 23.8,
+      "offGrid": false
+    }
+  },
+  {
+    "id": "AA-1775286495776-585",
+    "timestamp": "2026-04-04T07:08:15.776Z",
+    "contact": {
+      "name": "John Tech",
+      "phone": "+94771234567",
+      "email": "john@tech.com"
+    },
+    "location": {
+      "city": "Colombo",
+      "country": "LK"
+    },
+    "answers": {
+      "isCommercial": false,
+      "isThreePhase": false,
+      "monthlyUsageKwh": 253000,
+      "needsBackup": true,
+      "backupHours": 12,
+      "goalMaxIncome": false,
+      "offGrid": false,
+      "needsEV": true,
+      "evChargingKw": 7,
+      "evKmPerDay": 40,
+      "name": "John Tech",
+      "phone": "+94771234567",
+      "email": "john@tech.com",
+      "city": "Colombo",
+      "countryCode": "LK",
+      "roofAreaM2": null,
+      "roofOverridden": false
+    }
+  }
+]

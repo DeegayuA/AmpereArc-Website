@@ -29,7 +29,7 @@ export function ProductsBentoGrid() {
   }, []);
 
   const filteredProducts = useMemo(() => {
-    return products.filter(p => p.category === activeCat && p.subCategory === activeSub);
+    return products.filter(p => p.category === activeCat && p.subCategory === activeSub && p.visible !== false);
   }, [activeCat, activeSub]);
 
   /**
@@ -148,7 +148,7 @@ export function ProductsBentoGrid() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.99, y: -10 }}
                 transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 auto-rows-[14rem] md:auto-rows-[18rem] grid-flow-dense"
+                className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 auto-rows-[22rem] md:auto-rows-[18rem] grid-flow-dense"
               >
                 {displayedProducts.map((item, idx) => (
                   <BentoCard key={`${item.id}-${idx}`} item={item} index={idx} isMobile={isMobile} />
@@ -238,15 +238,15 @@ function BentoCard({ item, index, isMobile }: { item: typeof products[0] & { spa
 
       {/* Content Engine */}
       <div className={`absolute inset-0 flex flex-col justify-end z-10 transition-all duration-500 ${
-        isMobile || !isLarge ? 'p-3' : 'p-6'
+        isMobile ? 'p-5' : (!isLarge ? 'p-3' : 'p-6')
       } group-hover:p-4`}>
         {/* Info Module */}
         <div className={`relative overflow-hidden bg-white/40 dark:bg-black/40 backdrop-blur-3xl rounded-2xl md:rounded-[2.5rem] border border-white/30 dark:border-white/10 group-hover:border-primary/50 transition-all duration-700 shadow-2xl ${
-          isMobile || !isLarge ? 'p-3 md:p-4' : 'p-6 md:p-8'
+          isMobile ? 'p-6' : (!isLarge ? 'p-3 md:p-4' : 'p-6 md:p-8')
         }`}>
           <div className="flex flex-col gap-1 md:gap-2">
             <div className={`flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] ${
-              isMobile || !isLarge ? 'text-[6px]' : 'text-[10px]'
+              isMobile ? 'text-[8px]' : (!isLarge ? 'text-[6px]' : 'text-[10px]')
             }`}>
               <span>{t.products.hardware}</span>
               <div className="h-[0.5px] w-3 bg-primary/40" />
@@ -254,7 +254,7 @@ function BentoCard({ item, index, isMobile }: { item: typeof products[0] & { spa
             
             <motion.h3
               className={`font-black font-heading text-foreground leading-[1.1] ${
-                isMobile || !isLarge ? 'text-xs md:text-xl' : 'text-xl md:text-4xl'
+                isMobile ? 'text-xl' : (!isLarge ? 'text-xs md:text-xl' : 'text-xl md:text-4xl')
               }`}
             >
               {item.title}
@@ -269,16 +269,16 @@ function BentoCard({ item, index, isMobile }: { item: typeof products[0] & { spa
             <div className="flex items-center justify-between mt-2 md:mt-4">
               <div className="flex flex-col min-w-0">
                 <span className={`font-black uppercase tracking-widest text-foreground/40 leading-none ${
-                  isMobile || !isLarge ? 'text-[5px]' : 'text-[8px]'
+                  isMobile ? 'text-[8px]' : (!isLarge ? 'text-[5px]' : 'text-[8px]')
                 }`}>{t.products.price}</span>
                 <div className={`flex gap-1 md:gap-2 ${isLarge && !isMobile ? 'items-baseline flex-row' : 'flex-col items-start'}`}>
                   <span className={`font-black font-heading text-primary leading-none truncate ${
-                    isMobile || !isLarge ? 'text-xs md:text-lg' : 'text-xl md:text-5xl'
+                    isMobile ? 'text-3xl' : (!isLarge ? 'text-xs md:text-lg' : 'text-xl md:text-5xl')
                   }`}>
                     {formatPrice(currentDiscountedPrice, currency)}
                   </span>
                   <span className={`font-bold text-foreground/30 line-through decoration-primary/40 decoration-1 transition-all opacity-60 ${
-                    isMobile || !isLarge ? 'text-[7px]' : 'text-xs md:text-2xl'
+                    isMobile ? 'text-lg' : (!isLarge ? 'text-[7px]' : 'text-xs md:text-2xl')
                   }`}>
                     {formatPrice(currentBasePrice, currency)}
                   </span>

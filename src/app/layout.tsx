@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Providers } from "@/components/Providers";
 import { DevBanner } from "@/components/layout/DevBanner";
 import Script from "next/script";
+import { ClientLayoutShell } from "@/components/layout/ClientLayoutShell";
 
 const genos = Genos({
   variable: "--font-genos",
@@ -28,9 +29,6 @@ export const metadata: Metadata = {
   description: "Smarter, Greener Energy Storage for a Sustainable Future - Leading the way in battery storage technology.",
 };
 
-import { RecommendationModal } from "@/components/home/RecommendationModal";
-import { useModal } from "@/components/providers/ModalProvider";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -43,7 +41,7 @@ export default function RootLayout({
       className={`${openSans.variable} ${genos.variable} h-full antialiased`}
     >
       <body>
-        <Script id="google-translate-init" strategy="afterInteractive">
+        <Script id="google-translate-config" strategy="afterInteractive">
           {`
             function googleTranslateElementInit() {
               new google.translate.TranslateElement({
@@ -58,28 +56,22 @@ export default function RootLayout({
           src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" 
           strategy="afterInteractive" 
         />
-        <div id="google_translate_element" style={{ display: 'none' }}></div>
-        <LoadingScreen />
+        
         <Providers>
           <div className="fixed top-0 left-0 right-0 z-40 flex flex-col">
             <DevBanner />
             <Header />
           </div>
-          <main className="flex-1 overflow-x-hidden pt-28">{children}</main>
+          
+          <ClientLayoutShell>
+            {/* Translate Div Must Exist on Client */}
+            <div id="google_translate_element" style={{ display: 'none' }}></div>
+            <main className="flex-1 overflow-x-hidden pt-28">{children}</main>
+          </ClientLayoutShell>
+
           <Footer />
-          <ModalContainer />
         </Providers>
       </body>
     </html>
-  );
-}
-
-function ModalContainer() {
-  const { isRecommendationOpen, setRecommendationOpen } = useModal();
-  return (
-    <RecommendationModal 
-      isOpen={isRecommendationOpen} 
-      onClose={() => setRecommendationOpen(false)} 
-    />
   );
 }
