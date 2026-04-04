@@ -79,25 +79,4 @@ export const products: Product[] = [
   }
 ];
 
-export const partners = [
-  { name: "Apple", slug: "apple" },
-  { name: "Tesla", slug: "tesla" },
-  { name: "Google", slug: "google" },
-  { name: "Microsoft", slug: "microsoft" },
-  { name: "Amazon", slug: "amazon" },
-  { name: "NVIDIA", slug: "nvidia" },
-  { name: "Meta", slug: "meta" },
-  { name: "Samsung", slug: "samsung" },
-  { name: "Toyota", slug: "toyota" },
-  { name: "Mercedes-Benz", slug: "mercedes-benz" },
-  { name: "Porsche", slug: "porsche" },
-  { name: "BMW", slug: "bmw" },
-  { name: "Sony", slug: "sony" },
-  { name: "Nike", slug: "nike" },
-  { name: "Adidas", slug: "adidas" },
-  { name: "Coca-Cola", slug: "cocacola" },
-  { name: "Pepsi", slug: "pepsi" },
-  { name: "Starbucks", slug: "starbucks" },
-  { name: "Visa", slug: "visa" },
-  { name: "Mastercard", slug: "mastercard" }
-];
+export const partners: { name: string; slug: string }[] = [];

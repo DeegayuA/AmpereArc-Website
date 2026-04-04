@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { GooeyInput } from "@/components/ui/gooey-input";
 import { Menu, X, Sun, Moon, Search, ChevronDown, Rocket, Users, Building2, UserCircle2 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -62,8 +63,21 @@ export function Header() {
         }`}
       >
         {/* Brand Protected from Translation */}
-        <Link href="/" className="flex items-center gap-3 relative z-10 group notranslate">
-          <span className="font-heading font-black text-2xl lg:text-3xl tracking-tighter transition-colors duration-300 text-foreground">
+        <Link href="/" className="flex items-center gap-2 lg:gap-3 relative z-10 group notranslate shrink-0">
+          <div className="relative w-8 h-8 lg:w-10 lg:h-10">
+            <Image
+              src="/assets/Logos/AmpereArc-Symbol-CLR.png"
+              alt="AmpereArc Logo"
+              fill
+              className={`object-contain transition-all duration-500 ease-in-out ${isScrolled
+                  ? (isDark ? "brightness-100" : "grayscale-0")
+                  : "brightness-100"
+                }`}
+              sizes="40px"
+              priority
+            />
+          </div>
+          <span className="font-heading font-black text-xl lg:text-3xl tracking-tighter transition-colors duration-300 text-foreground">
             AmpereArc
           </span>
         </Link>
@@ -72,11 +86,11 @@ export function Header() {
         <div className="hidden lg:flex items-center gap-6 xl:gap-10">
           {/* Solutions Dropdown */}
           <div 
-            className="relative"
+            className="flex"
             onMouseEnter={() => setSolutionsOpen(true)}
             onMouseLeave={() => setSolutionsOpen(false)}
           >
-            <button className="flex items-center gap-1.5 font-bold text-xs uppercase tracking-widest transition-colors text-foreground/70 hover:text-primary">
+            <button className="flex items-center gap-1.5 font-bold text-xs uppercase tracking-widest transition-colors text-foreground/70 hover:text-primary whitespace-nowrap">
               {t.nav.solutions}
               <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${solutionsOpen ? "rotate-180" : ""}`} />
             </button>
@@ -87,7 +101,7 @@ export function Header() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute left-1/2 -translate-x-1/2 mt-4 w-72 bg-background/95 backdrop-blur-2xl border border-border/50 rounded-[2rem] shadow-2xl p-3 grid gap-1 overflow-hidden"
+                  className="absolute left-1/2 -translate-x-1/2 mt-12 w-72 bg-background/95 backdrop-blur-2xl border border-border/50 rounded-[2rem] shadow-2xl p-3 grid gap-1 overflow-hidden"
                 >
                   {solutions.map((item) => (
                     <Link
@@ -109,11 +123,13 @@ export function Header() {
             </AnimatePresence>
           </div>
 
-          {links.map((link) => (
+          {links.map((link, idx) => (
             <Link 
               key={link.name} 
               href={link.href} 
-              className="font-bold text-xs uppercase tracking-widest transition-colors text-foreground/70 hover:text-primary"
+              className={`font-bold text-xs uppercase tracking-widest transition-colors text-foreground/70 hover:text-primary whitespace-nowrap ${
+                idx > 0 ? "hidden xl:block" : "block"
+              }`}
             >
               {link.name}
             </Link>
@@ -124,9 +140,9 @@ export function Header() {
         <div className="hidden lg:flex items-center gap-3 xl:gap-5">
           <GooeyInput
             placeholder="Search..."
-            collapsedWidth={isScrolled ? 100 : 120}
-            expandedWidth={isScrolled ? 180 : 220}
-            className="z-10"
+            collapsedWidth={isScrolled ? 80 : 100}
+            expandedWidth={isScrolled ? 150 : 200}
+            className="z-10 hidden xl:block"
           />
 
           <SettingsDropdown />

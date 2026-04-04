@@ -39,7 +39,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${openSans.variable} ${genos.variable} h-full antialiased`}
     >
-      <head>
+      <body className="min-h-full flex flex-col font-sans transition-colors duration-300">
         <Script id="google-translate-init" strategy="afterInteractive">
           {`
             function googleTranslateElementInit() {
@@ -55,8 +55,6 @@ export default function RootLayout({
           src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" 
           strategy="afterInteractive" 
         />
-      </head>
-      <body className="min-h-full flex flex-col font-sans transition-colors duration-300">
         <div id="google_translate_element" style={{ display: 'none' }}></div>
         <Providers>
           <div className="fixed top-0 left-0 right-0 z-50 flex flex-col">

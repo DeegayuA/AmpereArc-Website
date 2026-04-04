@@ -173,7 +173,7 @@ export function CalculatorSection() {
             <div className="group">
               <div className="flex justify-between items-end mb-4">
                 <label className="text-sm font-semibold text-background/60 group-hover:text-primary transition-colors">
-                  Average Monthly Bill
+                  Average Monthly Bill (GBP)
                 </label>
                 <div className="text-2xl font-black font-heading text-primary">
                   {formatPrice(convertPrice(monthlyBillGBP, currency), currency)}
@@ -182,7 +182,7 @@ export function CalculatorSection() {
               <div className="relative h-4 w-full bg-white/10 rounded-full mb-2">
                 <motion.div 
                   className="absolute left-0 top-0 h-full bg-gradient-to-r from-primary/50 to-primary rounded-full"
-                  style={{ width: `${((monthlyBill - 50) / 950) * 100}%` }}
+                  style={{ width: `${((monthlyBillGBP - 50) / 950) * 100}%` }}
                 />
                 <input
                   type="range"

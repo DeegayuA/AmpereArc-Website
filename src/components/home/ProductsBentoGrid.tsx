@@ -151,7 +151,7 @@ export function ProductsBentoGrid() {
                 className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 auto-rows-[14rem] md:auto-rows-[18rem] grid-flow-dense"
               >
                 {displayedProducts.map((item, idx) => (
-                  <BentoCard key={item.id} item={item} index={idx} isMobile={isMobile} />
+                  <BentoCard key={`${item.id}-${idx}`} item={item} index={idx} isMobile={isMobile} />
                 ))}
               </motion.div>
             ) : (
@@ -267,19 +267,19 @@ function BentoCard({ item, index, isMobile }: { item: typeof products[0] & { spa
             )}
 
             <div className="flex items-center justify-between mt-2 md:mt-4">
-              <div className="flex flex-col">
+              <div className="flex flex-col min-w-0">
                 <span className={`font-black uppercase tracking-widest text-foreground/40 leading-none ${
                   isMobile || !isLarge ? 'text-[5px]' : 'text-[8px]'
                 }`}>{t.products.price}</span>
-                <div className="flex items-baseline gap-2">
-                  <span className={`font-black font-heading text-primary leading-none ${
-                    isMobile || !isLarge ? 'text-sm md:text-2xl' : 'text-xl md:text-5xl'
+                <div className={`flex gap-1 md:gap-2 ${isLarge && !isMobile ? 'items-baseline flex-row' : 'flex-col items-start'}`}>
+                  <span className={`font-black font-heading text-primary leading-none truncate ${
+                    isMobile || !isLarge ? 'text-xs md:text-lg' : 'text-xl md:text-5xl'
                   }`}>
                     {formatPrice(currentDiscountedPrice, currency)}
                   </span>
-                  <span className={`font-bold text-foreground/30 line-through decoration-primary/40 decoration-1 transition-all ${
-                    isMobile || !isLarge ? 'text-[8px] md:text-base' : 'text-xs md:text-2xl'
-                  } opacity-60`}>
+                  <span className={`font-bold text-foreground/30 line-through decoration-primary/40 decoration-1 transition-all opacity-60 ${
+                    isMobile || !isLarge ? 'text-[7px]' : 'text-xs md:text-2xl'
+                  }`}>
                     {formatPrice(currentBasePrice, currency)}
                   </span>
                 </div>
