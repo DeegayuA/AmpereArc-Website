@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { CurrencyCode, countryToCurrency, localeToCurrency } from "@/lib/currency";
+import { CurrencyCode, countryToCurrency, localeToCurrency, formatPrice, convertPrice } from "@/lib/currency";
 import { Locale, translations, TranslationSchema, locales } from "@/lib/i18n";
 
 interface SettingsContextType {
@@ -10,6 +10,8 @@ interface SettingsContextType {
   locale: Locale;
   setLocale: (l: Locale) => void;
   t: TranslationSchema;
+  formatPrice: (amount: number, currency: CurrencyCode) => string;
+  convertPrice: (amount: number, targetCurrency: CurrencyCode) => number;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -115,7 +117,9 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         setCurrency: handleSetCurrency, 
         locale, 
         setLocale: handleSetLocale,
-        t 
+        t,
+        formatPrice,
+        convertPrice
       }}
     >
       <div style={{ visibility: mounted ? "visible" : "hidden" }}>

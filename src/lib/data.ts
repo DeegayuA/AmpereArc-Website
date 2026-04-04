@@ -19,6 +19,11 @@ export interface Product {
   discountPercentage: number;
   img: string;
   className?: string;
+  tags: string[];
+  metadata: {
+    kw?: number;
+    kwh?: number;
+  };
 }
 
 export const products: Product[] = [
@@ -31,7 +36,9 @@ export const products: Product[] = [
     basePrice: 3200,
     discountPercentage: 15,
     img: "/assets/Products/10kW_Hybrid_Inveter.png", 
-    className: "md:col-span-2 md:row-span-2" 
+    className: "md:col-span-2 md:row-span-2",
+    tags: ["high-power", "backup", "efficiency"],
+    metadata: { kw: 10 }
   },
   { 
     id: "h-bess-16.8kw", 
@@ -42,7 +49,9 @@ export const products: Product[] = [
     basePrice: 6500,
     discountPercentage: 18,
     img: "/assets/Products/16.8kW_Battery.png", 
-    className: "md:col-span-2 md:row-span-1" 
+    className: "md:col-span-2 md:row-span-1",
+    tags: ["large-capacity", "autonomy", "backup"],
+    metadata: { kwh: 16.8 }
   },
   { 
     id: "h-bess-16.8kw-slim", 
@@ -53,7 +62,9 @@ export const products: Product[] = [
     basePrice: 6800,
     discountPercentage: 12,
     img: "/assets/Products/16.8kW_Battery_2.png", 
-    className: "md:col-span-1 md:row-span-1" 
+    className: "md:col-span-1 md:row-span-1",
+    tags: ["slim", "modern", "large-capacity"],
+    metadata: { kwh: 16.8 }
   },
   { 
     id: "h-bess-4.8kw", 
@@ -64,7 +75,9 @@ export const products: Product[] = [
     basePrice: 2400,
     discountPercentage: 20,
     img: "/assets/Products/4.8kW_Battery.png", 
-    className: "md:col-span-1 md:row-span-1" 
+    className: "md:col-span-1 md:row-span-1",
+    tags: ["compact", "entry-level", "savings"],
+    metadata: { kwh: 4.8 }
   },
   { 
     id: "h-inv-5kw", 
@@ -75,7 +88,9 @@ export const products: Product[] = [
     basePrice: 1800,
     discountPercentage: 10,
     img: "/assets/Products/5kW_Hybrid_Inveter.png", 
-    className: "md:col-span-2 md:row-span-1" 
+    className: "md:col-span-2 md:row-span-1",
+    tags: ["efficiency", "safety", "compact"],
+    metadata: { kw: 5 }
   }
 ];
 

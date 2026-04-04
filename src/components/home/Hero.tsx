@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { RecommendationModal } from "./RecommendationModal";
 
 const backgrounds = {
   home: "/assets/Hero_BG/home.png",
@@ -14,6 +15,36 @@ const backgrounds = {
 export function Hero() {
   const [bg, setBg] = useState<keyof typeof backgrounds>("home");
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isRecommendationOpen, setIsRecommendationOpen] = useState(false);
+
+  // Auto-advance logic
+  useEffect(() => {
+    if (isPaused) {
+      setProgress(0);
+      return;
+    }
+
+    const interval = 5000;
+    const step = 50; 
+    const increment = (step / interval) * 100;
+
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          const sequence: Array<keyof typeof backgrounds> = ["home", "commercial", "installer"];
+          const currentIndex = sequence.indexOf(bg);
+          const nextIndex = (currentIndex + 1) % sequence.length;
+          setBg(sequence[nextIndex]);
+          return 0;
+        }
+        return prev + increment;
+      });
+    }, step);
+
+    return () => clearInterval(timer);
+  }, [bg, isPaused]);
   
   // Parallax setup
   const mouseX = useMotionValue(0);
@@ -37,6 +68,8 @@ export function Hero() {
   return (
     <section 
       onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
       className="relative w-full h-screen min-h-[800px] overflow-hidden flex flex-col justify-end bg-background"
     >
       {/* Background Image with Mask */}
@@ -104,7 +137,10 @@ export function Hero() {
             className="flex flex-wrap items-center gap-6"
           >
             {/* Primary Button */}
-            <Link href="#how-it-works" className="group relative inline-flex items-center justify-center p-1 rounded-sm bg-foreground text-background font-bold tracking-wider uppercase text-sm overflow-hidden h-[54px] pr-6 pl-1 decoration-transparent">
+            <button 
+              onClick={() => setIsRecommendationOpen(true)}
+              className="group relative inline-flex items-center justify-center p-1 rounded-sm bg-foreground text-background font-bold tracking-wider uppercase text-sm overflow-hidden h-[54px] pr-6 pl-1 decoration-transparent"
+            >
               {/* Dot Grid Box */}
               <div className="w-[46px] h-[46px] bg-primary rounded-sm relative flex flex-wrap content-between justify-between p-2 mr-4 overflow-hidden">
                 <div className="absolute inset-0 flex flex-wrap content-between justify-between p-2 group-hover:-translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]">
@@ -121,7 +157,7 @@ export function Hero() {
                 </div>
               </div>
               <span className="z-10 transition-transform duration-300 group-hover:translate-x-2">Find out how it works</span>
-            </Link>
+            </button>
 
             {/* Secondary Button */}
             <Link href="#products" className="text-foreground hover:text-primary transition-colors font-bold tracking-widest uppercase text-sm flex items-center gap-2 group">
@@ -140,6 +176,7 @@ export function Hero() {
           href="/homeowner"
           onMouseEnter={() => setBg("home")}
           isActive={bg === "home"}
+          progress={bg === "home" ? progress : 0}
         />
         <TriggerButton
           title="Commercial"
@@ -147,6 +184,7 @@ export function Hero() {
           href="/commercial"
           onMouseEnter={() => setBg("commercial")}
           isActive={bg === "commercial"}
+          progress={bg === "commercial" ? progress : 0}
         />
         <TriggerButton
           title="Installer"
@@ -154,13 +192,23 @@ export function Hero() {
           href="/installer"
           onMouseEnter={() => setBg("installer")}
           isActive={bg === "installer"}
+          progress={bg === "installer" ? progress : 0}
         />
       </div>
+
+      <RecommendationModal 
+        isOpen={isRecommendationOpen} 
+        onClose={() => setIsRecommendationOpen(false)} 
+      />
     </section>
   );
 }
 
-function TriggerButton({ title, desc, href, onMouseEnter, isActive }: { title: string, desc: string, href: string, onMouseEnter: () => void, isActive: boolean }) {
+function TriggerButton({ 
+  title, desc, href, onMouseEnter, isActive, progress 
+}: { 
+  title: string, desc: string, href: string, onMouseEnter: () => void, isActive: boolean, progress: number 
+}) {
   return (
     <Link
       href={href}
@@ -170,10 +218,16 @@ function TriggerButton({ title, desc, href, onMouseEnter, isActive }: { title: s
       }`}
     >
       {isActive && (
-        <motion.div
-           layoutId="active-indicator"
-           className="absolute top-0 left-0 right-0 h-1 bg-primary"
-        />
+        <>
+          <motion.div
+             layoutId="active-indicator"
+             className="absolute top-0 left-0 right-0 h-1 bg-primary/20"
+          />
+          <motion.div
+             className="absolute top-0 left-0 h-1 bg-primary"
+             style={{ width: `${progress}%` }}
+          />
+        </>
       )}
       <h3 className={`font-heading font-bold text-xl md:text-2xl transition-colors duration-300 ${isActive ? "text-primary" : "text-foreground"}`}>
         {title}

@@ -28,6 +28,9 @@ export const metadata: Metadata = {
   description: "Smarter, Greener Energy Storage for a Sustainable Future - Leading the way in battery storage technology.",
 };
 
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
+import { PageTransition } from "@/components/providers/PageTransition";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -39,7 +42,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${openSans.variable} ${genos.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans transition-colors duration-300">
+      <body>
         <Script id="google-translate-init" strategy="afterInteractive">
           {`
             function googleTranslateElementInit() {
@@ -56,12 +59,15 @@ export default function RootLayout({
           strategy="afterInteractive" 
         />
         <div id="google_translate_element" style={{ display: 'none' }}></div>
+        <LoadingScreen />
         <Providers>
-          <div className="fixed top-0 left-0 right-0 z-50 flex flex-col">
+          <div className="fixed top-0 left-0 right-0 z-40 flex flex-col">
             <DevBanner />
             <Header />
           </div>
-          <main className="flex-1 overflow-x-hidden">{children}</main>
+          <PageTransition>
+            <main className="flex-1 overflow-x-hidden pt-28">{children}</main>
+          </PageTransition>
           <Footer />
         </Providers>
       </body>
