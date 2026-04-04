@@ -15,12 +15,13 @@ import { SolarWizardResult } from "./SolarWizardResult";
 
 interface Props { isOpen: boolean; onClose: () => void; }
 
-type StepId = "project"|"phase"|"usage"|"backup"|"goal"|"ev"|"location"|"contact"|"roof"|"result";
+type StepId = "project"|"phase"|"usage"|"peak_load"|"backup"|"goal"|"ev"|"location"|"contact"|"roof"|"result";
 
 const STEPS: { id: StepId; label: string }[] = [
   { id: "project",  label: "Property" },
   { id: "phase",    label: "Supply" },
   { id: "usage",    label: "Usage" },
+  { id: "peak_load",label: "Instant Power" },
   { id: "backup",   label: "Backup" },
   { id: "goal",     label: "Goal" },
   { id: "ev",       label: "EV & Range" },
@@ -62,6 +63,7 @@ const defaultAnswers = {
   countryCode: "LK",
   roofAreaM2: null as number | null,
   roofOverridden: false,
+  instantPeakKw: 2,
 };
 
 export function RecommendationModal({ isOpen, onClose }: Props) {
@@ -71,6 +73,7 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
   const [liveRates, setLiveRates] = useState<Record<string, number> | null>(null);
   const [design, setDesign] = useState<SystemDesign | null>(null);
   const [isCalc, setIsCalc] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState("AI Design Engine initializing...");
   const [answers, setAnswers] = useState(defaultAnswers);
 
   useEffect(() => {
@@ -114,8 +117,21 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
       evKmPerDay: answers.evKmPerDay,
       countryCode: answers.countryCode,
       roofAreaM2: answers.roofOverridden ? answers.roofAreaM2 : null,
+      instantPeakKw: answers.instantPeakKw,
     };
-    await new Promise(r => setTimeout(r, 900));
+    
+    setLoadingMsg("Analyzing roof spatial footprint...");
+    await new Promise(r => setTimeout(r, 600));
+
+    setLoadingMsg("Sizing intelligent inverters for peak load...");
+    await new Promise(r => setTimeout(r, 700));
+
+    setLoadingMsg("Calculating seasonal power generation...");
+    await new Promise(r => setTimeout(r, 600));
+
+    setLoadingMsg("Finalizing your 25-year ROI...");
+    await new Promise(r => setTimeout(r, 500));
+
     setDesign(calculateSystem(inputs, products));
     setIsCalc(false);
     go("result");
@@ -242,10 +258,59 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
                                 className="w-full text-center text-6xl font-black font-heading bg-transparent outline-none text-primary"/>
                             <p className="text-xl font-bold text-foreground/40 mt-2">kWh per Month</p>
                           </div>
-                          <input type="range" min={50} max={answers.isCommercial?5000:1500}
-                             value={answers.monthlyUsageKwh}
-                             onChange={e=>set("monthlyUsageKwh", parseInt(e.target.value))}
-                             className="w-full accent-primary"/>
+                          <div>
+                            <input type="range" min={50} max={answers.isCommercial?5000:1500}
+                               value={answers.monthlyUsageKwh}
+                               onChange={e=>set("monthlyUsageKwh", parseInt(e.target.value))}
+                               className="w-full accent-primary"/>
+                            <div className="flex justify-between items-center mt-2 px-1">
+                              <p className="text-[10px] uppercase font-black tracking-widest text-foreground/30">
+                                Estimated Panels Needed
+                              </p>
+                              <p className="text-xs font-black text-primary">
+                                ~{Math.ceil((answers.monthlyUsageKwh/30) / (((answers.isCommercial?720:500)/1000)*5.2*0.78))} Panels
+                              </p>
+                            </div>
+                          </div>
+                          <NavBtn onClick={()=>go("peak_load")}/>
+                        </div>
+                      </Wrap>
+                    )}
+
+                    {/* ── PEAK LOAD ── */}
+                    {step==="peak_load"&&(
+                      <Wrap title="Peak Instant Power" sub="What are your highest simultaneous loads?" onBack={()=>go("usage",false)}>
+                        <div className="space-y-6">
+                           <div className="bg-secondary/5 border border-border/50 rounded-2xl p-6 text-center">
+                            <input type="number" 
+                                value={answers.instantPeakKw}
+                                onFocus={e => e.target.select()}
+                                onChange={e=>set("instantPeakKw", Math.max(0, parseInt(e.target.value)||0))}
+                                className="w-full text-center text-6xl font-black font-heading bg-transparent outline-none text-primary"/>
+                            <p className="text-xl font-bold text-foreground/40 mt-2">Max Peak kW</p>
+                          </div>
+                          <div>
+                            <input type="range" min={1} max={answers.isCommercial?100:30}
+                               value={answers.instantPeakKw}
+                               onChange={e=>set("instantPeakKw", parseInt(e.target.value))}
+                               className="w-full accent-primary"/>
+                            <p className="text-[10px] text-foreground/40 font-bold mt-2">
+                              Your inverter size needs to match your instant peak usage if you run heavy appliances like Heat Pumps, A/C, or Welding simultaneously.
+                            </p>
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                             {[
+                               {l: "A/C Unit", v: 2}, {l: "Heat Pump", v: 5},
+                               {l: "Water Heater", v: 3}, {l: "EV Charger", v: 7},
+                               {l: "Welder/Heavy", v: 10}, {l: "Induction Ovens", v: 6}
+                             ].map(item => (
+                               <button key={item.l} onClick={() => set("instantPeakKw", (answers.instantPeakKw || 0) + item.v)}
+                                 className="p-3 rounded-xl border border-border/50 bg-white text-center hover:bg-primary/5 hover:border-primary/50 transition-colors">
+                                 <span className="block font-black text-xs">+{item.v}kW</span>
+                                 <span className="text-[9px] opacity-70">{item.l}</span>
+                               </button>
+                             ))}
+                          </div>
                           <NavBtn onClick={()=>go("backup")}/>
                         </div>
                       </Wrap>
@@ -253,7 +318,7 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
 
                     {/* ── BACKUP ── */}
                     {step==="backup"&&(
-                      <Wrap title="Backup Requirements" sub="Stay powered during outages." onBack={()=>go("usage",false)}>
+                      <Wrap title="Backup Requirements" sub="Stay powered during outages." onBack={()=>go("peak_load",false)}>
                         <div className="space-y-4">
                           <Grid3>
                             <Card icon={Zap} title="No Backup" desc="Grid-tied only" note="Purely for bill savings." selected={!answers.needsBackup && !answers.offGrid} onClick={()=>{set("needsBackup",false);set("offGrid",false);go("goal");}}/>
@@ -417,12 +482,12 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
                                 className="relative z-10 object-contain"
                               />
                             </motion.div>
-                            <div className="flex flex-col items-center gap-2">
+                            <div className="flex flex-col items-center gap-2 text-center mt-4 h-12">
                               <div className="flex items-center gap-2">
                                 <Loader2 className="w-4 h-4 text-primary animate-spin"/>
                                 <p className="text-foreground/40 font-black uppercase tracking-widest text-[11px]">AI Design Engine</p>
                               </div>
-                              <p className="text-xl font-heading font-black">Optimizing your performance…</p>
+                              <p className="text-lg font-heading font-black max-w-[250px]">{loadingMsg}</p>
                             </div>
                           </div>
                         )

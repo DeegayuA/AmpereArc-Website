@@ -48,6 +48,7 @@ export interface SystemInputs {
   evKmPerDay?: number;        // New: Daily driving distance for fuel savings
   countryCode: string;
   roofAreaM2: number | null;  // null = auto-calculate
+  instantPeakKw?: number;     // New: Max simultaneous peak demand
 }
 
 export interface ProductSelection {
@@ -185,7 +186,8 @@ export function calculateSystem(inputs: SystemInputs, allProducts: Product[]): S
   }
 
   const systemKwp = Math.round((panelCount * panelWp) / 100) / 10;
-  const inverterCount = Math.max(1, Math.ceil(systemKwp / inverterKw));
+  const requiredInverterKw = Math.max(systemKwp, inputs.instantPeakKw ?? 0);
+  const inverterCount = Math.max(1, Math.ceil(requiredInverterKw / inverterKw));
 
   // ── PANEL PRODUCT SELECTION ──────────────────────────────────────
   const panelPool = allProducts

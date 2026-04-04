@@ -20,9 +20,9 @@ interface Props {
   countryCode: string;
 }
 
-const BIZ_WHATSAPP = "+94777123456"; // Business WhatsApp
-const BIZ_EMAIL    = "sales@amperearc.com";
-const BIZ_PHONE    = "+94777123456";
+const BIZ_WHATSAPP = "+447766130423"; // Business WhatsApp
+const BIZ_EMAIL    = "[EMAIL_ADDRESS]";
+const BIZ_PHONE    = "+447766130423";
 
 export function SolarWizardResult({
   design, fmtUsd, currency, onReset, onClose, city, countryCode
@@ -147,8 +147,37 @@ export function SolarWizardResult({
         </div>
       </div>
 
+      {/* Seasonal Generation Chart */}
+      <div className="bg-amber-500/5 border border-amber-500/20 rounded-3xl p-6">
+        <div className="flex items-center justify-between mb-6">
+           <div className="flex items-center gap-2">
+             <TrendingUp className="w-5 h-5 text-amber-600"/>
+             <span className="text-[10px] font-black uppercase tracking-widest text-amber-600">Seasonal Production</span>
+           </div>
+           <p className="text-xs font-bold text-foreground/50">{annualGenerationKwh.toLocaleString()} kWh / Year</p>
+        </div>
+        <div className="flex items-end justify-between h-36 gap-1 md:gap-2">
+           {monthly.map((m, i) => (
+             <div key={i} className="flex-1 flex flex-col items-center gap-2 group relative">
+               <div className="absolute -top-6 opacity-0 group-hover:opacity-100 transition-opacity bg-background border border-border/50 text-[10px] font-bold px-2 py-1 rounded-lg z-10 whitespace-nowrap shadow-xl">
+                 {fmtUsd(m.savingsUsd)} savings
+               </div>
+               <div className="w-full relative bg-amber-500/10 rounded-t-md rounded-b-sm flex items-end overflow-hidden h-full">
+                  <motion.div 
+                    initial={{ height: 0 }}
+                    animate={{ height: `${(m.generationKwh / maxGen) * 100}%` }}
+                    transition={{ delay: i * 0.05, type: "spring", stiffness: 60 }}
+                    className="w-full bg-gradient-to-t from-amber-600 to-amber-500 rounded-t-md group-hover:brightness-110 transition-all"
+                  />
+               </div>
+               <span className="text-[9px] font-black uppercase text-foreground/40 mt-1">{m.month}</span>
+             </div>
+           ))}
+        </div>
+      </div>
+
       {/* Component Breakdown */}
-      <div className="space-y-3">
+      <div className="space-y-3 pt-2">
         <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40 px-1">System Components</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
