@@ -407,7 +407,7 @@ export function RecommendationModal({ isOpen, onClose, quickUsageKwh, quickEvKm 
                                 Estimated Panels Needed
                               </p>
                               <p className="text-xs font-black text-primary">
-                                ~{Math.ceil((answers.monthlyUsageKwh/30) / (((answers.isCommercial?720:500)/1000)*5.2*0.78))} Panels
+                                ~{liveDesign?.panelCount || 0} Panels
                               </p>
                             </div>
                           </div>

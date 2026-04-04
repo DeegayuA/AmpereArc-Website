@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SystemDesign, MONTHS_SHORT } from "@/lib/solar-engine";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
   Sun, Battery, Zap, Car, TrendingUp, CalendarDays, RefreshCw,
-  MessageCircle, Mail, Phone, CheckCircle2, Copy, Loader2, Gauge, Fuel
+  MessageCircle, Mail, Phone, CheckCircle2, Copy, Loader2, Gauge, Fuel, User
 } from "lucide-react";
 
 interface Props {
@@ -18,6 +18,8 @@ interface Props {
   liveRates: Record<string, number> | null;
   city: string;
   countryCode: string;
+  initialName?: string;
+  initialPhone?: string;
 }
 
 const BIZ_WHATSAPP = "+447766130423"; // Business WhatsApp
@@ -25,7 +27,7 @@ const BIZ_EMAIL    = "[EMAIL_ADDRESS]";
 const BIZ_PHONE    = "+447766130423";
 
 export function SolarWizardResult({
-  design, fmtUsd, currency, onReset, onClose, city, countryCode
+  design, fmtUsd, currency, onReset, onClose, city, countryCode, initialName, initialPhone
 }: Props) {
   const {
     panels, inverters, batteries, evCharger,
@@ -34,12 +36,21 @@ export function SolarWizardResult({
     lifetimeSavings25Yr, country, offGrid,
   } = design;
 
+  const [name, setName] = useState(initialName || "");
+  const [phone, setPhone] = useState(initialPhone || "");
+
+  useEffect(() => {
+    if (initialName) setName(initialName);
+    if (initialPhone) setPhone(initialPhone);
+  }, [initialName, initialPhone]);
+
   const monthlySavingsUsd = annualSavingsUsd / 12;
   const maxGen = Math.max(...monthly.map(m => m.generationKwh)) || 1;
   const totalAnnualBenefit = annualSavingsUsd + evFuelSavingsUsd;
 
   const [copied, setCopied] = useState(false);
   const [showMoreInfo, setShowMoreInfo] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const buildMessage = () => {
     return [
@@ -379,18 +390,35 @@ export function SolarWizardResult({
                <p className="text-sm opacity-50 mb-6">Our technical team will review your local grid conditions and send you a fully itemized official project proposal.</p>
                
                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2">Your Name</label>
-                    <input type="text" placeholder="Designate project owner..." 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary transition-all text-white"/>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2">WhatsApp Number</label>
-                    <input type="tel" placeholder="+ (Country Code) ..." 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary transition-all text-white"/>
-                  </div>
-                  <button className="md:col-span-2 bg-white text-foreground py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all shadow-2xl">
-                    Submit Project for Engineering Review
+                  {!initialName || !initialPhone ? (
+                    <>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2">Your Name</label>
+                        <input type="text" placeholder="Designate project owner..." value={name} onChange={e=>setName(e.target.value)}
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary transition-all text-white"/>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2">WhatsApp Number</label>
+                        <input type="tel" placeholder="+ (Country Code) ..." value={phone} onChange={e=>setPhone(e.target.value)}
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary transition-all text-white"/>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="md:col-span-2 p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <User className="w-5 h-5"/>
+                      </div>
+                      <div>
+                        <p className="text-xs font-black">{initialName}</p>
+                        <p className="text-[10px] opacity-40">{initialPhone}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <button 
+                    disabled={submitted}
+                    className="md:col-span-2 bg-white text-foreground py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all shadow-2xl disabled:opacity-50 disabled:bg-white/10 disabled:text-white/40">
+                    {submitted ? "Project Submitted Successfully" : initialName ? "Confirm & Submit for Engineering Review" : "Submit Project for Engineering Review"}
                   </button>
                </div>
             </div>
