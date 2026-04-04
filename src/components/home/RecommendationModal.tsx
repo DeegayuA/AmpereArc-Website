@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import {
   X, ArrowLeft, Home, Building2, Zap, Battery, Shield,
   TrendingUp, Car, MapPin, ChevronRight, Loader2, Globe, Sun, User, Phone, Mail, CheckCircle2
@@ -389,7 +390,38 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
                     {step==="result"&&(
                       design
                         ? <SolarWizardResult design={design} fmtUsd={fmtUsd} currency={currency} onReset={reset} onClose={onClose} liveRates={liveRates} city={answers.city} countryCode={answers.countryCode}/>
-                        : <div className="flex flex-col items-center justify-center gap-4 py-24"><Loader2 className="w-10 h-10 text-primary animate-spin"/><p className="text-foreground/40 font-bold">Designing your system…</p></div>
+                        : (
+                          <div className="flex flex-col items-center justify-center gap-6 py-32">
+                            <motion.div 
+                              animate={{ 
+                                scale: [1, 1.1, 1],
+                                opacity: [0.7, 1, 0.7] 
+                              }}
+                              transition={{ 
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                              }}
+                              className="relative w-24 h-24 flex items-center justify-center"
+                            >
+                              <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse" />
+                              <Image 
+                                src="/assets/Logos/AmpereArc-Symbol-CLR.png" 
+                                alt="AmpereArc" 
+                                width={80} 
+                                height={80} 
+                                className="relative z-10 object-contain"
+                              />
+                            </motion.div>
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="flex items-center gap-2">
+                                <Loader2 className="w-4 h-4 text-primary animate-spin"/>
+                                <p className="text-foreground/40 font-black uppercase tracking-widest text-[11px]">AI Design Engine</p>
+                              </div>
+                              <p className="text-xl font-heading font-black">Optimizing your performance…</p>
+                            </div>
+                          </div>
+                        )
                     )}
                   </motion.div>
                 </AnimatePresence>

@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export function LoadingScreen() {
   const [loading, setLoading] = useState(true);
@@ -29,12 +30,16 @@ export function LoadingScreen() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 1, ease: "easeOut" }}
-              className="relative"
+              className="relative flex flex-col items-center gap-4"
             >
-              {/* Brand Text Protected */}
-              <span className="notranslate font-heading font-black text-6xl md:text-8xl tracking-tighter text-foreground select-none">
-                AmpereArc
-              </span>
+              {/* Logo Symbol */}
+              <Image 
+                src="/assets/Logos/AmpereArc-Symbol-CLR.png" 
+                alt="AmpereArc" 
+                width={120} 
+                height={120} 
+                className="object-contain"
+              />
               
               {/* Scanning Light Effect */}
               <motion.div 
@@ -46,7 +51,7 @@ export function LoadingScreen() {
                   ease: "easeInOut",
                   repeatDelay: 0.5 
                 }}
-                className="absolute top-0 bottom-0 w-20 bg-gradient-to-r from-transparent via-primary/30 to-transparent skew-x-12 pointer-events-none"
+                className="absolute top-0 bottom-0 w-20 bg-gradient-to-r from-transparent via-primary/20 to-transparent skew-x-12 pointer-events-none"
               />
             </motion.div>
 
