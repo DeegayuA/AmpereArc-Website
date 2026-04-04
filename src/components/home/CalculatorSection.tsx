@@ -1,23 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
-// --- Currency Config ---
-const rates = { GBP: 1, USD: 1.25, EUR: 1.15, LKR: 380, INR: 104, AUD: 1.9 };
-const symbols = { GBP: "£", USD: "$", EUR: "€", LKR: "Rs", INR: "₹", AUD: "A$" };
-type Currency = keyof typeof rates;
+import { useSettings } from "@/components/providers/SettingsProvider";
+import { formatPrice, convertPrice } from "@/lib/currency";
 
 export function CalculatorSection() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  // Calculator State
-  const [currency, setCurrency] = useState<Currency>("GBP");
-  const [monthlyBill, setMonthlyBill] = useState(150);
+  const { currency } = useSettings();
+  
+  // Calculator State (Base values in GBP)
+  const [monthlyBillGBP, setMonthlyBillGBP] = useState(150);
   const [hasSolar, setHasSolar] = useState(false);
 
   // --- Advanced Logic ---
-  const annualBill = monthlyBill * 12;
+  const annualBill = monthlyBillGBP * 12;
   const savingsFactor = hasSolar ? 0.85 : 0.65; // Optimized for BESS efficacy
   const annualSavings = annualBill * savingsFactor;
   const fiveYearSavings = annualSavings * 5.25; // Factoring in grid inflation (approx 5%)
@@ -164,15 +163,8 @@ export function CalculatorSection() {
         >
           <div className="mb-4 flex justify-between items-center bg-white/5 p-3 rounded-2xl border border-white/5">
             <h3 className="font-bold text-xl font-heading text-background">Impact Analysis</h3>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-background/40 font-bold uppercase tracking-wider">Currency:</span>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value as Currency)}
-                className="bg-primary/20 text-primary border border-primary/20 rounded-lg px-3 py-1.5 text-sm outline-none font-bold hover:bg-primary/30 transition-colors"
-              >
-                {Object.keys(rates).map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
+            <div className="bg-primary/20 text-primary px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider border border-primary/20">
+              {currency}
             </div>
           </div>
 
@@ -184,7 +176,7 @@ export function CalculatorSection() {
                   Average Monthly Bill
                 </label>
                 <div className="text-2xl font-black font-heading text-primary">
-                  {symbols[currency]} {Math.round(monthlyBill * rates[currency]).toLocaleString()}
+                  {formatPrice(convertPrice(monthlyBillGBP, currency), currency)}
                 </div>
               </div>
               <div className="relative h-4 w-full bg-white/10 rounded-full mb-2">
@@ -195,15 +187,15 @@ export function CalculatorSection() {
                 <input
                   type="range"
                   min="50" max="1000" step="5"
-                  value={monthlyBill}
-                  onChange={(e) => setMonthlyBill(Number(e.target.value))}
+                  value={monthlyBillGBP}
+                  onChange={(e) => setMonthlyBillGBP(Number(e.target.value))}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer appearance-none z-20"
                   style={{ transform: 'scaleY(4)' }}
                 />
               </div>
               <div className="flex justify-between text-[10px] text-background/30 font-bold">
-                <span>{symbols[currency]} {Math.round(50 * rates[currency])}</span>
-                <span>{symbols[currency]} {Math.round(1000 * rates[currency])}</span>
+                <span>{formatPrice(convertPrice(50, currency), currency)}</span>
+                <span>{formatPrice(convertPrice(1000, currency), currency)}</span>
               </div>
             </div>
 
@@ -234,13 +226,13 @@ export function CalculatorSection() {
               <div className="bg-white/5 p-4 rounded-3xl border border-white/5">
                 <div className="text-[9px] font-black text-background/30 uppercase tracking-[0.2em] mb-1">Annual Savings</div>
                 <div className="text-2xl font-black font-heading text-primary">
-                  {symbols[currency]}{Math.round(annualSavings * rates[currency]).toLocaleString()}
+                  {formatPrice(convertPrice(annualSavings, currency), currency)}
                 </div>
               </div>
               <div className="bg-white/5 p-4 rounded-3xl border border-white/5">
                 <div className="text-[9px] font-black text-background/30 uppercase tracking-[0.2em] mb-1">5-Year Saving</div>
                 <div className="text-2xl font-black font-heading text-background">
-                  {symbols[currency]}{Math.round(fiveYearSavings * rates[currency]).toLocaleString()}
+                  {formatPrice(convertPrice(fiveYearSavings, currency), currency)}
                 </div>
               </div>
               <div className="col-span-2 bg-primary group hover:bg-primary/90 transition-colors p-4 rounded-[1.5rem] flex items-center justify-between shadow-xl shadow-primary/20 cursor-pointer">

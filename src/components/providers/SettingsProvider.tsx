@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { CurrencyCode, countryToCurrency, localeToCurrency } from "@/lib/currency";
-import { Locale, translations, TranslationSchema } from "@/lib/i18n";
+import { Locale, translations, TranslationSchema, locales } from "@/lib/i18n";
 
 interface SettingsContextType {
   currency: CurrencyCode;
@@ -28,12 +28,20 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     if (savedCurrency) {
       setCurrency(savedCurrency);
     }
-    if (savedLocale) {
+    
+    // Check if there's a google translate cookie already
+    const googTrans = document.cookie.split("; ").find(row => row.startsWith("googtrans="));
+    if (googTrans) {
+      const lang = googTrans.split("/").pop() as Locale;
+      if (lang && locales.some(l => l.code === lang)) {
+        setLocale(lang);
+      }
+    } else if (savedLocale) {
       setLocale(savedLocale);
     }
 
     // Only auto-detect if no manual override exists
-    if (!savedCurrency || !savedLocale) {
+    if (!savedCurrency || (!savedLocale && !googTrans)) {
       autoDetectSettings(savedCurrency, savedLocale);
     }
   }, []);
@@ -47,7 +55,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       const browserLocale = navigator.language;
       const browserLanguage = browserLocale.split("-")[0] as Locale;
       
-      if (!existingLocale && (browserLanguage === "en" || browserLanguage === "de")) {
+      if (!existingLocale && locales.some(l => l.code === browserLanguage)) {
         setLocale(browserLanguage);
       }
 
@@ -66,8 +74,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
           if (detectedCurrency) setCurrency(detectedCurrency);
         }
         
-        if (!existingLocale && !["en", "de"].includes(browserLanguage)) {
+        if (!existingLocale && !locales.some(l => l.code === browserLanguage)) {
           if (data.country_code === "DE") setLocale("de");
+          else if (data.country_code === "LK") setLocale("si");
+          else if (data.country_code === "IN") setLocale("hi");
           else setLocale("en");
         }
       }
@@ -84,6 +94,15 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const handleSetLocale = (l: Locale) => {
     setLocale(l);
     localStorage.setItem("preferred-locale", l);
+    
+    // Google Translate Cookie logic
+    // Format: /source/target (e.g. /en/de)
+    const cookieValue = `/en/${l}`;
+    document.cookie = `googtrans=${cookieValue}; path=/;`;
+    document.cookie = `googtrans=${cookieValue}; path=/; domain=.${window.location.hostname};`;
+    
+    // Reload to apply translation
+    window.location.reload();
   };
 
   // Provide a stable translation object even before mount to prevent hydration mismatch

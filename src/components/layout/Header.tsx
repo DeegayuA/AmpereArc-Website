@@ -3,12 +3,10 @@
 import { useState, useEffect } from "react";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
 import { GooeyInput } from "@/components/ui/gooey-input";
-import { Menu, X, Sun, Moon, Search } from "lucide-react";
+import { Menu, X, Sun, Moon, Search, ChevronDown, Rocket, Users, Building2, UserCircle2 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { CurrencySelector } from "@/components/ui/currency-selector";
-import { LanguageSelector } from "@/components/ui/language-selector";
+import { SettingsDropdown } from "@/components/ui/settings-dropdown";
 import { useSettings } from "@/components/providers/SettingsProvider";
 
 export function Header() {
@@ -16,6 +14,7 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [solutionsOpen, setSolutionsOpen] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { t } = useSettings();
@@ -25,7 +24,7 @@ export function Header() {
   }, []);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setIsScrolled(latest > 50);
+    setIsScrolled(latest > 20);
   });
 
   const links = [
@@ -35,10 +34,10 @@ export function Header() {
     { name: t.nav.portal, href: "#" },
   ];
 
-  const secondaryLinks = [
-    { name: t.nav.homeowner, href: "/homeowner" },
-    { name: t.nav.commercial, href: "/commercial" },
-    { name: t.nav.installer, href: "/installer" },
+  const solutions = [
+    { name: t.nav.homeowner, href: "/homeowner", icon: Users, desc: "Residential storage solutions" },
+    { name: t.nav.commercial, href: "/commercial", icon: Building2, desc: "Industrial & enterprise power" },
+    { name: t.nav.installer, href: "/installer", icon: UserCircle2, desc: "Partner program & resources" },
   ];
 
   const toggleTheme = () => {
@@ -49,164 +48,168 @@ export function Header() {
 
   return (
     <motion.header
-      className={`relative w-full transition-colors duration-500 ease-in-out ${isScrolled ? "bg-background/80 backdrop-blur-lg border-b border-border/50" : "bg-transparent"
-        }`}
+      className="fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-500 py-4 lg:py-6"
+      style={{
+        paddingTop: isScrolled ? "1rem" : "1.5rem",
+      }}
     >
-      {/* Top Banner - hidden on scroll */}
-      <AnimatePresence>
-        {!isScrolled && (
-          <motion.div
-            initial={{ height: 40, opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="flex items-center justify-between px-6 lg:px-12 bg-secondary/10 dark:bg-black/20 text-sm overflow-hidden"
-          >
-            <div className="flex items-center gap-6">
-              {secondaryLinks.map((link) => (
-                <Link key={link.href} href={link.href} className="hover:text-primary transition-colors text-xs font-bold uppercase tracking-wider">
-                  {link.name}
-                </Link>
-              ))}
-            </div>
-            <div className="flex flex-row gap-6 items-center">
-              <LanguageSelector />
-              <div className="h-4 w-[1px] bg-border/40" />
-              <CurrencySelector />
-              <div className="h-4 w-[1px] bg-border/40" />
-              <Link href="/contact" className="hover:text-primary transition-colors text-xs font-bold uppercase tracking-wider">
-                {t.nav.contact}
-              </Link>
-              <Link href="/get-in-touch" className="bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
-                {t.nav.getInTouch}
-              </Link>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Main Navbar */}
-      <nav className="flex items-center justify-between px-6 lg:px-12 h-20">
-        {/* Dynamic Logo */}
-        <Link href="/" className="flex items-center gap-3 relative z-10 group">
-          <div className="relative w-10 h-10">
-            <Image
-              src="/assets/Logos/AmpereArc-Symbol-CLR.png"
-              alt="AmpereArc Logo"
-              fill
-              className={`object-contain transition-all duration-500 ease-in-out ${isScrolled
-                  ? (isDark ? "brightness-0 invert opacity-100" : "grayscale brightness-0 opacity-80")
-                  : "brightness-100 invert-0 opacity-100"
-                }`}
-              sizes="40px"
-              priority
-            />
-          </div>
-          <span className="font-heading font-bold text-3xl tracking-tight transition-colors duration-300">
+      <motion.div
+        layout
+        className={`relative flex items-center justify-between px-6 lg:px-10 transition-all duration-500 ease-in-out ${
+          isScrolled 
+            ? "w-[95%] lg:w-[85%] h-16 rounded-full bg-background/70 backdrop-blur-2xl border border-border/50 shadow-[0_8px_32px_rgba(0,0,0,0.12)]" 
+            : "w-full h-20 bg-transparent border-transparent"
+        }`}
+      >
+        {/* Brand Protected from Translation */}
+        <Link href="/" className="flex items-center gap-3 relative z-10 group notranslate">
+          <span className="font-heading font-black text-2xl lg:text-3xl tracking-tighter transition-colors duration-300 text-foreground">
             AmpereArc
           </span>
         </Link>
 
         {/* Desktop Links */}
-        <div className="hidden lg:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-6 xl:gap-10">
+          {/* Solutions Dropdown */}
+          <div 
+            className="relative"
+            onMouseEnter={() => setSolutionsOpen(true)}
+            onMouseLeave={() => setSolutionsOpen(false)}
+          >
+            <button className="flex items-center gap-1.5 font-bold text-xs uppercase tracking-widest transition-colors text-foreground/70 hover:text-primary">
+              {t.nav.solutions}
+              <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${solutionsOpen ? "rotate-180" : ""}`} />
+            </button>
+            
+            <AnimatePresence>
+              {solutionsOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute left-1/2 -translate-x-1/2 mt-4 w-72 bg-background/95 backdrop-blur-2xl border border-border/50 rounded-[2rem] shadow-2xl p-3 grid gap-1 overflow-hidden"
+                >
+                  {solutions.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className="flex items-center gap-4 p-4 rounded-2xl group transition-all duration-300 hover:bg-primary/10"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+                        <item.icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs font-black uppercase tracking-wider text-foreground">{item.name}</span>
+                        <span className="text-[10px] text-foreground/50 leading-tight">{item.desc}</span>
+                      </div>
+                    </Link>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           {links.map((link) => (
-            <Link key={link.name} href={link.href} className="font-medium hover:text-primary transition-colors">
+            <Link 
+              key={link.name} 
+              href={link.href} 
+              className="font-bold text-xs uppercase tracking-widest transition-colors text-foreground/70 hover:text-primary"
+            >
               {link.name}
             </Link>
           ))}
         </div>
 
-        <div className="hidden lg:flex items-center gap-4">
+        {/* Right Actions */}
+        <div className="hidden lg:flex items-center gap-3 xl:gap-5">
           <GooeyInput
             placeholder="Search..."
-            collapsedWidth={120}
-            expandedWidth={220}
+            collapsedWidth={isScrolled ? 100 : 120}
+            expandedWidth={isScrolled ? 180 : 220}
             className="z-10"
           />
 
-          {/* Theme Toggle Button */}
+          <SettingsDropdown />
+
           <button
             onClick={toggleTheme}
-            className={`p-2 rounded-full bg-transparent backdrop-blur-md border transition-all duration-300 ${isDark
-                ? "text-primary border-white/20 hover:border-primary/50"
-                : "text-zinc-800 border-zinc-800 hover:border-zinc-900"
-              } ${!isDark && !isScrolled ? "text-white border-white/40 hover:border-white" : ""}`}
+            className={`p-2.5 rounded-full transition-all duration-300 border ${
+              isDark
+                ? "bg-primary/10 text-primary border-primary/20 hover:border-primary/50"
+                : "bg-secondary/10 dark:bg-white/5 border-secondary/20 hover:border-primary/30 text-foreground"
+            }`}
             aria-label="Toggle theme"
           >
             {mounted ? (
-              isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />
+              isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />
             ) : (
-              <div className="w-5 h-5" />
+              <div className="w-4 h-4" />
             )}
           </button>
+
+          <Link 
+            href="/contact" 
+            className="px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-500 shadow-lg bg-primary text-white hover:bg-primary/90 shadow-primary/20"
+          >
+            {t.nav.getInTouch}
+          </Link>
         </div>
 
-        {/* Mobile Toggle */}
-        <div className="flex items-center gap-2 lg:hidden">
-          {/* Mobile Search Toggle */}
-          <button
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
-            className={`p-2 rounded-full border transition-all duration-300 ${isDark
-                ? "text-white border-white/20"
-                : "text-zinc-800 border-zinc-800"
-              } ${!isDark && !isScrolled ? "text-white border-white/40" : ""}`}
-            aria-label="Search"
+        {/* Mobile Toggle Group */}
+        <div className="flex items-center gap-3 lg:hidden">
+          <SettingsDropdown />
+          <button 
+            className="p-2 rounded-full border border-border/50 transition-colors text-foreground" 
+            onClick={() => setMobileOpen(!mobileOpen)}
           >
-            {isSearchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
-          </button>
-
-          {/* Mobile Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className={`p-2 rounded-full border transition-all duration-300 ${isDark
-                ? "text-white border-white/20"
-                : "text-zinc-800 border-zinc-800"
-              } ${!isDark && !isScrolled ? "text-white border-white/40" : ""}`}
-            aria-label="Toggle theme"
-          >
-            {mounted && (isDark ? <Sun className="w-5 h-5 text-primary" /> : <Moon className="w-5 h-5 text-primary" />)}
-          </button>
-          <button className={`p-2 ${!isDark && !isScrolled ? "text-white" : "text-foreground"}`} onClick={() => setMobileOpen(!mobileOpen)}>
-            {mobileOpen ? <X /> : <Menu />}
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
-      </nav>
+      </motion.div>
 
-      {/* Mobile Search Dropdown */}
-      <AnimatePresence>
-        {isSearchOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="lg:hidden bg-background border-b border-border/50 px-6 py-4"
-          >
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search products, case studies..."
-                autoFocus
-                className="w-full bg-secondary/5 border border-border rounded-full py-3 px-6 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-              />
-              <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overhaul */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="lg:hidden bg-background border-b border-border overflow-hidden"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-24 left-4 right-4 bg-background/95 backdrop-blur-2xl border border-border/50 rounded-[2.5rem] shadow-2xl p-6 lg:hidden overflow-hidden"
           >
-            <div className="flex flex-col p-6 gap-4">
-              {links.map((link) => (
-                <Link key={link.name} href={link.href} className="font-medium text-lg border-b border-border/50 pb-2">
-                  {link.name}
+            <div className="flex flex-col gap-6">
+              <div className="grid gap-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary/60 px-4">Navigation</span>
+                {links.map((link) => (
+                  <Link key={link.name} href={link.href} className="text-xl font-bold px-4 py-2 hover:text-primary transition-colors">
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
+
+              <div className="grid gap-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary/60 px-4">Solutions</span>
+                <div className="grid grid-cols-1 gap-2">
+                  {solutions.map((item) => (
+                    <Link key={item.name} href={item.href} className="flex items-center gap-3 px-4 py-3 bg-secondary/5 rounded-2xl">
+                      <item.icon className="w-4 h-4 text-primary" />
+                      <span className="font-bold text-sm">{item.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between px-4 pt-4 border-t border-border/50">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Appearance</span>
+                  <button onClick={toggleTheme} className="flex items-center gap-2 font-bold text-sm">
+                    {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                    {isDark ? "Light Mode" : "Dark Mode"}
+                  </button>
+                </div>
+                <Link href="/contact" className="bg-primary text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20">
+                  {t.nav.getInTouch}
                 </Link>
-              ))}
+              </div>
             </div>
           </motion.div>
         )}

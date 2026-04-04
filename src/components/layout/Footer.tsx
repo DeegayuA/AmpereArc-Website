@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { IconBrandFacebook, IconBrandInstagram, IconBrandLinkedin, IconBrandYoutube } from "@tabler/icons-react";
 
@@ -11,13 +10,7 @@ export function Footer() {
         {/* Newsletter Column */}
         <div className="flex flex-col gap-6 lg:col-span-1">
           <Link href="/" className="flex items-center gap-3">
-            <Image
-              src="/assets/Logos/AmpereArc-Symbol-WT.png"
-              alt="AmpereArc Logo"
-              width={40}
-              height={40}
-            />
-            <span className="font-heading font-bold text-3xl tracking-tight text-white">
+            <span className="notranslate font-heading font-bold text-3xl tracking-tight text-white">
               AmpereArc
             </span>
           </Link>
@@ -97,6 +90,13 @@ export function Footer() {
             Visit the author
           </Link>
         </div>
+      </div>
+      
+      {/* Temporary Development Notice */}
+      <div className="max-w-7xl mx-auto mt-6 text-center">
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/40">
+          Website still under development
+        </p>
       </div>
     </footer>
   );

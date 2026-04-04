@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Providers } from "@/components/Providers";
 import { DevBanner } from "@/components/layout/DevBanner";
+import Script from "next/script";
 
 const genos = Genos({
   variable: "--font-genos",
@@ -38,7 +39,25 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${openSans.variable} ${genos.variable} h-full antialiased`}
     >
+      <head>
+        <Script id="google-translate-init" strategy="afterInteractive">
+          {`
+            function googleTranslateElementInit() {
+              new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,de,si,hi,es,fr,it,ja',
+                autoDisplay: false,
+              }, 'google_translate_element');
+            }
+          `}
+        </Script>
+        <Script 
+          src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" 
+          strategy="afterInteractive" 
+        />
+      </head>
       <body className="min-h-full flex flex-col font-sans transition-colors duration-300">
+        <div id="google_translate_element" style={{ display: 'none' }}></div>
         <Providers>
           <div className="fixed top-0 left-0 right-0 z-50 flex flex-col">
             <DevBanner />
