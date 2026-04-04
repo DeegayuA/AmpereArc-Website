@@ -7,6 +7,9 @@ import Image from "next/image";
 import { GooeyInput } from "@/components/ui/gooey-input";
 import { Menu, X, Sun, Moon, Search } from "lucide-react";
 import { useTheme } from "next-themes";
+import { CurrencySelector } from "@/components/ui/currency-selector";
+import { LanguageSelector } from "@/components/ui/language-selector";
+import { useSettings } from "@/components/providers/SettingsProvider";
 
 export function Header() {
   const { scrollY } = useScroll();
@@ -15,6 +18,7 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { t } = useSettings();
 
   useEffect(() => {
     setMounted(true);
@@ -25,10 +29,16 @@ export function Header() {
   });
 
   const links = [
-    { name: "Products", href: "#products" },
-    { name: "Blog", href: "#" },
-    { name: "Case Studies", href: "#" },
-    { name: "AmpereArc Portal", href: "#" },
+    { name: t.nav.products, href: "#products" },
+    { name: t.nav.blog, href: "#" },
+    { name: t.nav.caseStudies, href: "#" },
+    { name: t.nav.portal, href: "#" },
+  ];
+
+  const secondaryLinks = [
+    { name: t.nav.homeowner, href: "/homeowner" },
+    { name: t.nav.commercial, href: "/commercial" },
+    { name: t.nav.installer, href: "/installer" },
   ];
 
   const toggleTheme = () => {
@@ -51,14 +61,22 @@ export function Header() {
             className="flex items-center justify-between px-6 lg:px-12 bg-secondary/10 dark:bg-black/20 text-sm overflow-hidden"
           >
             <div className="flex items-center gap-6">
-              <Link href="/homeowner" className="hover:text-primary transition-colors">Homeowner</Link>
-              <Link href="/commercial" className="hover:text-primary transition-colors">Commercial</Link>
-              <Link href="/installer" className="hover:text-primary transition-colors">Installer</Link>
+              {secondaryLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="hover:text-primary transition-colors text-xs font-bold uppercase tracking-wider">
+                  {link.name}
+                </Link>
+              ))}
             </div>
-            <div className="flex flex-row gap-4 items-center">
-              <Link href="/contact" className="hover:text-primary transition-colors">Contact us</Link>
-              <Link href="/get-in-touch" className="bg-primary text-primary-foreground px-4 py-1 rounded-full font-medium hover:bg-primary/90 transition-colors">
-                Get In Touch
+            <div className="flex flex-row gap-6 items-center">
+              <LanguageSelector />
+              <div className="h-4 w-[1px] bg-border/40" />
+              <CurrencySelector />
+              <div className="h-4 w-[1px] bg-border/40" />
+              <Link href="/contact" className="hover:text-primary transition-colors text-xs font-bold uppercase tracking-wider">
+                {t.nav.contact}
+              </Link>
+              <Link href="/get-in-touch" className="bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+                {t.nav.getInTouch}
               </Link>
             </div>
           </motion.div>

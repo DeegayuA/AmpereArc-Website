@@ -6,9 +6,9 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 const backgrounds = {
-  home: "/assets/Hero_BG/Home.jpeg",
-  commercial: "/assets/Hero_BG/Commercial.jpg",
-  installer: "/assets/Hero_BG/Installer.jpeg",
+  home: "/assets/Hero_BG/home.png",
+  commercial: "/assets/Hero_BG/commercial.png",
+  installer: "/assets/Hero_BG/installer.png",
 };
 
 export function Hero() {

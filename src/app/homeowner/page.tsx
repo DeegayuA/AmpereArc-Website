@@ -27,7 +27,7 @@ export default function HomeownerPage() {
         <div className="grid md:grid-cols-2 gap-12 items-center mb-24">
           <div className="relative h-[400px] rounded-3xl overflow-hidden bg-muted">
             <Image 
-              src="/assets/Hero_BG/Home.jpeg" 
+              src="/assets/Hero_BG/home.png" 
               alt="Homeowner" 
               fill 
               className="object-cover"

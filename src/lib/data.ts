@@ -15,122 +15,68 @@ export interface Product {
   desc: string;
   category: "Home" | "Commercial";
   subCategory: string;
-  prevBill: string;
-  nowBill: string;
-  savings: string;
+  basePrice: number;
+  discountPercentage: number;
   img: string;
   className?: string;
 }
 
 export const products: Product[] = [
-  // --- HOME: BESS (8 items) ---
-  { id: "h-bess-1", title: "EcoStack Home 10kWh", desc: "Premium lithium-ion storage with integrated BMS for complete home backup.", category: "Home", subCategory: "BESS (Battery Energy Storage)", prevBill: "$280", nowBill: "$45", savings: "84%", img: "https://images.unsplash.com/photo-1593941707882-a52009230588?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "h-bess-2", title: "ArcWall Slim 5kWh", desc: "Space-saving wall-mounted battery for smaller residential systems.", category: "Home", subCategory: "BESS (Battery Energy Storage)", prevBill: "$150", nowBill: "$30", savings: "80%", img: "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-bess-3", title: "PrimeCore 15kWh", desc: "Our highest capacity residential unit for large estates.", category: "Home", subCategory: "BESS (Battery Energy Storage)", prevBill: "$400", nowBill: "$80", savings: "80%", img: "https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-2" },
-  { id: "h-bess-4", title: "NanoUnit 2.5kWh", desc: "Perfect for city apartments to bridge peak tariff periods.", category: "Home", subCategory: "BESS (Battery Energy Storage)", prevBill: "$80", nowBill: "$15", savings: "81%", img: "https://images.unsplash.com/photo-1620216518991-8be5e37894a4?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-bess-5", title: "MultiStack Modular", desc: "Add or remove modules as your energy needs grow.", category: "Home", subCategory: "BESS (Battery Energy Storage)", prevBill: "$300", nowBill: "$50", savings: "83%", img: "https://images.unsplash.com/photo-1593941707882-a52009230588?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-bess-6", title: "Outdoor Guard 10kWh", desc: "IP65-rated battery for external installation in any climate.", category: "Home", subCategory: "BESS (Battery Energy Storage)", prevBill: "$250", nowBill: "$40", savings: "84%", img: "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "h-bess-7", title: "RetroFit Hub", desc: "Upgrade your existing solar setup with intelligent energy storage.", category: "Home", subCategory: "BESS (Battery Energy Storage)", prevBill: "$200", nowBill: "$60", savings: "70%", img: "https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-bess-8", title: "SolarSync 7kWh", desc: "Optimized for high-speed charging directly from solar arrays.", category: "Home", subCategory: "BESS (Battery Energy Storage)", prevBill: "$180", nowBill: "$25", savings: "86%", img: "https://images.unsplash.com/photo-1620216518991-8be5e37894a4?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-
-  // --- HOME: Inverters (8 items) ---
-  { id: "h-inv-1", title: "Hybrid Core 5kW", desc: "Intelligent string inverter with dual MPPT logic.", category: "Home", subCategory: "Inverters", prevBill: "$320", nowBill: "$65", savings: "79%", img: "https://images.unsplash.com/photo-1621905252507-b35242f8df49?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-2" },
-  { id: "h-inv-2", title: "MicroGen 800W", desc: "Plug-and-play microinverter for balcony solar.", category: "Home", subCategory: "Inverters", prevBill: "$60", nowBill: "$10", savings: "83%", img: "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-inv-3", title: "SmartPulse 3.6kW", desc: "Reliable, high-efficiency inverter for home roofs.", category: "Home", subCategory: "Inverters", prevBill: "$200", nowBill: "$40", savings: "80%", img: "https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-inv-4", title: "TriplePower 10kW", desc: "Three-phase hybrid inverter for large estates.", category: "Home", subCategory: "Inverters", prevBill: "$500", nowBill: "$100", savings: "80%", img: "https://images.unsplash.com/photo-1621905252507-b35242f8df49?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "h-inv-5", title: "SilentSeries 2kW", desc: "Fanless design for indoor installation.", category: "Home", subCategory: "Inverters", prevBill: "$100", nowBill: "$20", savings: "80%", img: "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-inv-6", title: "SwiftGrid 6kW", desc: "Fastest grid-switching speeds under 10ms.", category: "Home", subCategory: "Inverters", prevBill: "$300", nowBill: "$55", savings: "82%", img: "https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-inv-7", title: "ArcCloud Inverter", desc: "Monitoring with built-in 4G failover.", category: "Home", subCategory: "Inverters", prevBill: "$280", nowBill: "$50", savings: "82%", img: "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-inv-8", title: "MasterControl 8kW", desc: "Complete home energy management unit.", category: "Home", subCategory: "Inverters", prevBill: "$450", nowBill: "$90", savings: "80%", img: "https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-
-  // --- HOME: EV Chargers (8 items) ---
-  { id: "h-ev-1", title: "ArcCharge Smart 7kW", desc: "WiFi-enabled smart solar charger.", category: "Home", subCategory: "EV Chargers", prevBill: "$120", nowBill: "$15", savings: "87%", img: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-ev-2", title: "RapidHome 22kW", desc: "Fastest home three-phase charger.", category: "Home", subCategory: "EV Chargers", prevBill: "$200", nowBill: "$40", savings: "80%", img: "https://images.unsplash.com/photo-1628131362771-3316de5fdfc5?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "h-ev-3", title: "NanoEV Mini", desc: "Ultra-compact charger for tight spaces.", category: "Home", subCategory: "EV Chargers", prevBill: "$100", nowBill: "$20", savings: "80%", img: "https://images.unsplash.com/photo-1563206767-5b18f218e0de?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-ev-4", title: "EcoDrive Solar", desc: "Pure roof-to-vehicle charging logic.", category: "Home", subCategory: "EV Chargers", prevBill: "$150", nowBill: "$0", savings: "100%", img: "https://images.unsplash.com/photo-1620138546344-7b2c38516ee3?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-2" },
-  { id: "h-ev-5", title: "ProTouch 7kW", desc: "Touch-screen onsite management.", category: "Home", subCategory: "EV Chargers", prevBill: "$130", nowBill: "$25", savings: "81%", img: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-ev-6", title: "HeavyDuty 11kW", desc: "Industrial-grade home wallbox.", category: "Home", subCategory: "EV Chargers", prevBill: "$180", nowBill: "$35", savings: "81%", img: "https://images.unsplash.com/photo-1628131362771-3316de5fdfc5?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-ev-7", title: "DualCharge Home", desc: "Two EVs from one unit.", category: "Home", subCategory: "EV Chargers", prevBill: "$300", nowBill: "$60", savings: "80%", img: "https://images.unsplash.com/photo-1563206767-5b18f218e0de?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "h-ev-8", title: "StealthPoint", desc: "Discreet architectural design.", category: "Home", subCategory: "EV Chargers", prevBill: "$110", nowBill: "$20", savings: "82%", img: "https://images.unsplash.com/photo-1620138546344-7b2c38516ee3?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-
-  // --- HOME: Smart Meters (8 items) ---
-  { id: "h-sm-1", title: "Insight Meter Gen 2", desc: "Real-time AI energy tracking.", category: "Home", subCategory: "Smart Meters", prevBill: "Varies", nowBill: "Optimized", savings: "15%", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "h-sm-2", title: "SenseHub Core", desc: "Phantom load detection technology.", category: "Home", subCategory: "Smart Meters", prevBill: "$200", nowBill: "$170", savings: "15%", img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-sm-3", title: "FlowCheck Utility", desc: "Combined water & energy monitoring.", category: "Home", subCategory: "Smart Meters", prevBill: "$300", nowBill: "$250", savings: "17%", img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=600&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-sm-4", title: "TariffSync Lite", desc: "Auto-shift loads to cheap grid windows.", category: "Home", subCategory: "Smart Meters", prevBill: "$250", nowBill: "$180", savings: "28%", img: "https://images.unsplash.com/photo-1558449028-s548c6073bbd?q=80&w=600&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-sm-5", title: "GridMaster Home", desc: "Bi-directional metering for export homes.", category: "Home", subCategory: "Smart Meters", prevBill: "Varies", nowBill: "Income", savings: "Export", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop", className: "md:col-span-1 md:row-span-2" },
-  { id: "h-sm-6", title: "PulseMonitor", desc: "DIN-rail circuit-level tracking.", category: "Home", subCategory: "Smart Meters", prevBill: "$180", nowBill: "$160", savings: "11%", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-sm-7", title: "EcoView Display", desc: "Wall-mounted ecosystem tablet.", category: "Home", subCategory: "Smart Meters", prevBill: "-", nowBill: "-", savings: "Control", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-sm-8", title: "NetZero Tracker", desc: "Carbon neutrality guidance dashboard.", category: "Home", subCategory: "Smart Meters", prevBill: "-", nowBill: "-", savings: "Green", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-
-  // --- HOME: Solar Panels (8 items) ---
-  { id: "h-sp-1", title: "BlackGlass 450W", desc: "Ultra-sleek all-black aesthetics.", category: "Home", subCategory: "Solar Panels", prevBill: "$300", nowBill: "$20", savings: "93%", img: "https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-2" },
-  { id: "h-sp-2", title: "Bifacial Pro+", desc: "Capture energy from both sides.", category: "Home", subCategory: "Solar Panels", prevBill: "$300", nowBill: "$15", savings: "95%", img: "https://images.unsplash.com/photo-1466611653911-95282fc3656b?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-sp-3", title: "EcoThin Flexible", desc: "Lightweight for curved structures.", category: "Home", subCategory: "Solar Panels", prevBill: "$200", nowBill: "$40", savings: "80%", img: "https://images.unsplash.com/photo-1566093097221-ac2335b09e70?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-sp-4", title: "ShingleSolar 100W", desc: "Integrated architectural tiles.", category: "Home", subCategory: "Solar Panels", prevBill: "$400", nowBill: "$100", savings: "75%", img: "https://images.unsplash.com/photo-1513828583688-c52646db42da?q=80&w=800&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "h-sp-5", title: "StormProof 400W", desc: "Extreme hail and wind reinforcement.", category: "Home", subCategory: "Solar Panels", prevBill: "$250", nowBill: "$30", savings: "88%", img: "https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-sp-6", title: "ClearSky Transparent", desc: "Solar glass for pergolas.", category: "Home", subCategory: "Solar Panels", prevBill: "$150", nowBill: "$45", savings: "70%", img: "https://images.unsplash.com/photo-1548518014-97ca0b4bd280?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-sp-7", title: "ArcticPanel Low-Light", desc: "High yield in hazy northern zones.", category: "Home", subCategory: "Solar Panels", prevBill: "$200", nowBill: "$60", savings: "70%", img: "https://images.unsplash.com/photo-1592833159057-6ffc621d3029?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "h-sp-8", title: "PrimePoly Value", desc: "Budget-conscious energy generation.", category: "Home", subCategory: "Solar Panels", prevBill: "$180", nowBill: "$50", savings: "72%", img: "https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?q=80&w=800&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-
-  // --- COMMERCIAL: BESS (8 items) ---
-  { id: "c-bess-1", title: "MegaStack Container 1MWh", desc: "Utility-scale storage for grid stabilization.", category: "Commercial", subCategory: "BESS (Battery Energy Storage)", prevBill: "$12,000", nowBill: "$3,800", savings: "68%", img: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-3 md:row-span-2" },
-  { id: "c-bess-2", title: "RackHub 100kWh", desc: "Modular storage for hospital server rooms.", category: "Commercial", subCategory: "BESS (Battery Energy Storage)", prevBill: "$1,500", nowBill: "$450", savings: "70%", img: "https://images.unsplash.com/photo-1593941707882-a52009230588?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-bess-3", title: "FactoryForce 500kWh", desc: "Industrial machinery power leveling.", category: "Commercial", subCategory: "BESS (Battery Energy Storage)", prevBill: "$6,000", nowBill: "$2,000", savings: "67%", img: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "c-bess-4", title: "HotelPure BESS", desc: "Zero ms backup switching for guest comfort.", category: "Commercial", subCategory: "BESS (Battery Energy Storage)", prevBill: "$3,000", nowBill: "$1,200", savings: "60%", img: "https://images.unsplash.com/photo-1593941707882-a52009230588?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-bess-5", title: "ArcVault Logistics", desc: "High-density storage for major warehouses.", category: "Commercial", subCategory: "BESS (Battery Energy Storage)", prevBill: "$4,500", nowBill: "$1,800", savings: "60%", img: "https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-bess-6", title: "GridShield IT", desc: "Protection against brownouts for data centers.", category: "Commercial", subCategory: "BESS (Battery Energy Storage)", prevBill: "$4,000", nowBill: "$1,500", savings: "62%", img: "https://images.unsplash.com/photo-1593941707882-a52009230588?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-bess-7", title: "StoreStore Retail", desc: "Cut peak charges during busy retail hours.", category: "Commercial", subCategory: "BESS (Battery Energy Storage)", prevBill: "$2,500", nowBill: "$900", savings: "64%", img: "https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "c-bess-8", title: "UrbanEdge 50kWh", desc: "Compact battery for city business centers.", category: "Commercial", subCategory: "BESS (Battery Energy Storage)", prevBill: "$1,200", nowBill: "$300", savings: "75%", img: "https://images.unsplash.com/photo-1593941707882-a52009230588?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-
-  // --- COMMERCIAL: Inverters (8 items) ---
-  { id: "c-inv-1", title: "CentralCore 500kW", desc: "Utility-scale central industrial inverter.", category: "Commercial", subCategory: "Inverters", prevBill: "$8,000", nowBill: "$2,000", savings: "75%", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-2" },
-  { id: "c-inv-2", title: "StringMaster 100kW", desc: "Scalable commercial rooftop solutions.", category: "Commercial", subCategory: "Inverters", prevBill: "$2,000", nowBill: "$500", savings: "75%", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "c-inv-3", title: "AgriPower Hybrid", desc: "Greenhouse and irrigation smart energy.", category: "Commercial", subCategory: "Inverters", prevBill: "$1,200", nowBill: "$300", savings: "75%", img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-inv-4", title: "MarineSwitch 50kW", desc: "Corrosion-resistant coastal inverter.", category: "Commercial", subCategory: "Inverters", prevBill: "$1,500", nowBill: "$400", savings: "73%", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-inv-5", title: "HighTemp Pro", desc: "Continuous operation in high-heat zones.", category: "Commercial", subCategory: "Inverters", prevBill: "$3,000", nowBill: "$800", savings: "73%", img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-2" },
-  { id: "c-inv-6", title: "PhaseCenter HV", desc: "High-voltage conversion for manufacturing.", category: "Commercial", subCategory: "Inverters", prevBill: "$5,000", nowBill: "$1,500", savings: "70%", img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-inv-7", title: "ArcBridge Substation", desc: "Developer tie-in power solutions.", category: "Commercial", subCategory: "Inverters", prevBill: "Varies", nowBill: "Varies", savings: "Build", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "c-inv-8", title: "SmartFactory Hub", desc: "Total power control for automated lines.", category: "Commercial", subCategory: "Inverters", prevBill: "$4,000", nowBill: "$1,000", savings: "75%", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-
-  // --- COMMERCIAL: EV Chargers (8 items) ---
-  { id: "c-ev-1", title: "ChargeFleet Tower 150kW", desc: "Ultra-fast DC charging station.", category: "Commercial", subCategory: "EV Chargers", prevBill: "Varies", nowBill: "Varies", savings: "DC Fast", img: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "c-ev-2", title: "MallPoint Dual 22kW", desc: "Double charging points for retail centers.", category: "Commercial", subCategory: "EV Chargers", prevBill: "$500", nowBill: "$100", savings: "80%", img: "https://images.unsplash.com/photo-1628131362771-3316de5fdfc5?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-ev-3", title: "OfficeGrid EV", desc: "Employee charging with RFID integration.", category: "Commercial", subCategory: "EV Chargers", prevBill: "$300", nowBill: "$60", savings: "80%", img: "https://images.unsplash.com/photo-1563206767-5b18f218e0de?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-2" },
-  { id: "c-ev-4", title: "BusVolt Supercharger", desc: "Electric city bus fleet specialized charging.", category: "Commercial", subCategory: "EV Chargers", prevBill: "High", nowBill: "Clean", savings: "Utility", img: "https://images.unsplash.com/photo-1614614614614-614614614614?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-ev-5", title: "SolarCarport Hub", desc: "Canopy solar and charging for warehouses.", category: "Commercial", subCategory: "EV Chargers", prevBill: "$2,000", nowBill: "$400", savings: "80%", img: "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-ev-6", title: "ParkCharge Multi", desc: "Grid-integrated public garage system.", category: "Commercial", subCategory: "EV Chargers", prevBill: "Varies", nowBill: "Varies", savings: "System", img: "https://images.unsplash.com/photo-1628131362771-3316de5fdfc5?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "c-ev-7", title: "FastTrack 50kW", desc: "Mid-tier DC fast charging for supermarkets.", category: "Commercial", subCategory: "EV Chargers", prevBill: "High", nowBill: "Fast", savings: "DC", img: "https://images.unsplash.com/photo-1563206767-5b18f218e0de?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-ev-8", title: "GreenFleet Master", desc: "Total fleet electrification software hub.", category: "Commercial", subCategory: "EV Chargers", prevBill: "-", nowBill: "-", savings: "Fleet", img: "https://images.unsplash.com/photo-1614614614614-614614614614?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-
-  // --- COMMERCIAL: Smart Meters (8 items) ---
-  { id: "c-sm-1", title: "Industrial Pulse Pro", desc: "Sub-metering with 1ms industrial resolution.", category: "Commercial", subCategory: "Smart Meters", prevBill: "$10,000", nowBill: "$7,000", savings: "30%", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-sm-2", title: "BuildingSense AI", desc: "Whole-building HVAC optimization.", category: "Commercial", subCategory: "Smart Meters", prevBill: "$5,000", nowBill: "$3,500", savings: "30%", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "c-sm-3", title: "TariffGuard Enterprise", desc: "Auto-shift massive industrial loads.", category: "Commercial", subCategory: "Smart Meters", prevBill: "$20,000", nowBill: "$14,000", savings: "30%", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-2" },
-  { id: "c-sm-4", title: "PowerQuality Analyser", desc: "Detect harmonics and electrical noise.", category: "Commercial", subCategory: "Smart Meters", prevBill: "-", nowBill: "-", savings: "Protect", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-sm-5", title: "NetMeter Commercial", desc: "Revenue-grade meter for developers.", category: "Commercial", subCategory: "Smart Meters", prevBill: "-", nowBill: "-", savings: "Revenue", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-sm-6", title: "GridBalance Hub", desc: "Frequency monitoring for utility storage.", category: "Commercial", subCategory: "Smart Meters", prevBill: "-", nowBill: "-", savings: "Balance", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "c-sm-7", title: "MultiSite CloudView", desc: "Enterprise utility management dashboard.", category: "Commercial", subCategory: "Smart Meters", prevBill: "Varies", nowBill: "Varies", savings: "Vis.", img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-sm-8", title: "EcoReport Pro", desc: "ESG compliant automated reporting.", category: "Commercial", subCategory: "Smart Meters", prevBill: "-", nowBill: "-", savings: "ESG", img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-
-  // --- COMMERCIAL: Solar Panels (8 items) ---
-  { id: "c-sp-1", title: "UtilityForce 700W Pro", desc: "Our highest output industrial panels.", category: "Commercial", subCategory: "Solar Panels", prevBill: "$50,000", nowBill: "$5,000", savings: "90%", img: "https://images.unsplash.com/photo-1466611653911-95282fc3656b?q=80&w=1200&auto=format&fit=crop", className: "md:col-span-2 md:row-span-2" },
-  { id: "c-sp-2", title: "Bifacial Industrial X", desc: "Dual-sided harvesting for arrays.", category: "Commercial", subCategory: "Solar Panels", prevBill: "$40,000", nowBill: "$4,000", savings: "90%", img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-sp-3", title: "FlatRoof Commercial", desc: "Low-profile aerodynamics for high-rise roofs.", category: "Commercial", subCategory: "Solar Panels", prevBill: "$10,000", nowBill: "$1,500", savings: "85%", img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-sp-4", title: "Glass-Glass DuraShield", desc: "Longevity for harsh industrial zones.", category: "Commercial", subCategory: "Solar Panels", prevBill: "Varies", nowBill: "Varies", savings: "Life", img: "https://images.unsplash.com/photo-1509391366360-fe5bb58583bb?q=80&w=1200&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-sp-5", title: "AgriSolar Transparent", desc: "Optimized greenhouses allowing light passage.", category: "Commercial", subCategory: "Solar Panels", prevBill: "$2,000", nowBill: "$500", savings: "75%", img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "c-sp-6", title: "OceanForce Floating", desc: "Floating marine-grade projet panels.", category: "Commercial", subCategory: "Solar Panels", prevBill: "N/A", nowBill: "N/A", savings: "Space", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-sp-7", title: "VerticalSky Towers", desc: "Façade-integrated solar for towers.", category: "Commercial", subCategory: "Solar Panels", prevBill: "High", nowBill: "Low", savings: "Ext.", img: "https://images.unsplash.com/photo-1548518014-97ca0b4bd280?q=80&w=1200&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-sp-8", title: "RapidDeploy Grid", desc: "Instant power for disaster relief zones.", category: "Commercial", subCategory: "Solar Panels", prevBill: "-", nowBill: "-", savings: "Fast", img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-
-  // --- COMMERCIAL: Industrial Solutions (8 items) ---  { id: "c-ind-1", title: "HV Inverter 250kW", desc: "High-voltage farm scale inverters.", category: "Commercial", subCategory: "Industrial Solutions", prevBill: "$5,000", nowBill: "$1,200", savings: "76%", img: "https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "c-ind-2", title: "FactoryFlow Hub", desc: "Automation hub for energy management.", category: "Commercial", subCategory: "Industrial Solutions", prevBill: "-", nowBill: "-", savings: "Control", img: "https://images.unsplash.com/photo-1593941707882-a52009230588?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-ind-3", title: "Solar Rack Industrial", desc: "Heavy-duty tracking system build.", category: "Commercial", subCategory: "Industrial Solutions", prevBill: "-", nowBill: "-", savings: "Build", img: "https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-ind-4", title: "BMS Pro Global", desc: "Manage multi-site battery fleets.", category: "Commercial", subCategory: "Industrial Solutions", prevBill: "-", nowBill: "-", savings: "Fleet", img: "https://images.unsplash.com/photo-1593941707882-a52009230588?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-2" },
-  { id: "c-ind-5", title: "AI PeakShave", desc: "Predictive algorithms for industrial cost.", category: "Commercial", subCategory: "Industrial Solutions", prevBill: "$2,000", nowBill: "$800", savings: "60%", img: "https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-ind-6", title: "WasteLink Heat", desc: "Capture industrial waste heat energy.", category: "Commercial", subCategory: "Industrial Solutions", prevBill: "$1,500", nowBill: "$900", savings: "40%", img: "https://images.unsplash.com/photo-1593941707882-a52009230588?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-2 md:row-span-1" },
-  { id: "c-ind-7", title: "Freight Hub Charge", desc: "Heavy EV freight infrastructure.", category: "Commercial", subCategory: "Industrial Solutions", prevBill: "$10,000", nowBill: "$3,000", savings: "70%", img: "https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" },
-  { id: "c-ind-8", title: "Emergency Bus", desc: "Instant high-load deployment bus.", category: "Commercial", subCategory: "Industrial Solutions", prevBill: "-", nowBill: "-", savings: "Safety", img: "https://images.unsplash.com/photo-1593941707882-a52009230588?q=80&w=1000&auto=format&fit=crop", className: "md:col-span-1 md:row-span-1" }
+  { 
+    id: "h-inv-10kw", 
+    title: "AmpereArc 10kW Hybrid Inverter", 
+    desc: "A powerful, high-efficiency hybrid inverter featuring dual MPPT trackers and integrated energy management. Designed for seamless transition to backup power during grid outages.", 
+    category: "Home", 
+    subCategory: "Inverters", 
+    basePrice: 3200,
+    discountPercentage: 15,
+    img: "/assets/Products/10kW_Hybrid_Inveter.png", 
+    className: "md:col-span-2 md:row-span-2" 
+  },
+  { 
+    id: "h-bess-16.8kw", 
+    title: "AmpereArc 16.8kWh High-Capacity Battery", 
+    desc: "Our flagship energy storage solution. This high-density lithium-ion battery provides reliable, long-lasting power for large residential estates and small commercial applications.", 
+    category: "Home", 
+    subCategory: "BESS (Battery Energy Storage)", 
+    basePrice: 6500,
+    discountPercentage: 18,
+    img: "/assets/Products/16.8kW_Battery.png", 
+    className: "md:col-span-2 md:row-span-1" 
+  },
+  { 
+    id: "h-bess-16.8kw-slim", 
+    title: "AmpereArc 16.8kWh Slimline Battery", 
+    desc: "Advanced energy storage in a space-saving, aesthetically pleasing design. Perfectly suited for modern homes where space is at a premium without compromising on capacity.", 
+    category: "Home", 
+    subCategory: "BESS (Battery Energy Storage)", 
+    basePrice: 6800,
+    discountPercentage: 12,
+    img: "/assets/Products/16.8kW_Battery_2.png", 
+    className: "md:col-span-1 md:row-span-1" 
+  },
+  { 
+    id: "h-bess-4.8kw", 
+    title: "AmpereArc 4.8kWh Residential Battery", 
+    desc: "The ideal entry-level energy storage system. Compact, scalable, and highly efficient, it's designed to optimize solar self-consumption for typical family homes.", 
+    category: "Home", 
+    subCategory: "BESS (Battery Energy Storage)", 
+    basePrice: 2400,
+    discountPercentage: 20,
+    img: "/assets/Products/4.8kW_Battery.png", 
+    className: "md:col-span-1 md:row-span-1" 
+  },
+  { 
+    id: "h-inv-5kw", 
+    title: "AmpereArc 5kW Hybrid Inverter", 
+    desc: "An intelligent single-phase hybrid inverter that maximizes solar harvest. It features built-in smart monitoring and rapid shutdown capabilities for enhanced safety.", 
+    category: "Home", 
+    subCategory: "Inverters", 
+    basePrice: 1800,
+    discountPercentage: 10,
+    img: "/assets/Products/5kW_Hybrid_Inveter.png", 
+    className: "md:col-span-2 md:row-span-1" 
+  }
 ];
 
 export const partners = [

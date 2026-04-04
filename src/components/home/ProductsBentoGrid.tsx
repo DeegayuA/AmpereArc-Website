@@ -1,16 +1,19 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Home, Building2, LayoutGrid, Zap, Battery, Car, Sun, ArrowRight } from "lucide-react";
 import { products, categories, subCategories } from "@/lib/data";
+import { useSettings } from "@/components/providers/SettingsProvider";
+import { convertPrice, formatPrice } from "@/lib/currency";
 
 export function ProductsBentoGrid() {
   const [activeCat, setActiveCat] = useState("Home");
   const [activeSub, setActiveSub] = useState("BESS (Battery Energy Storage)");
   const [visibleCount, setVisibleCount] = useState(2);
   const [isMobile, setIsMobile] = useState(false);
+  const { t } = useSettings();
 
   // Reset expansion when navigation changes
   useEffect(() => {
@@ -72,11 +75,11 @@ export function ProductsBentoGrid() {
         <div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-10">
           <div className="max-w-2xl">
             <h2 className="text-4xl md:text-6xl font-bold font-heading mb-4 text-foreground tracking-tight leading-[1.1]">
-              Intelligent Energy. <br />
-              <span className="text-primary italic">At Your Fingertips.</span>
+              {t.products.title} <br />
+              <span className="text-primary italic">{t.products.subtitle}</span>
             </h2>
             <p className="text-lg text-foreground/70 font-sans max-w-lg">
-              Precision hardware optimized for world-class efficiency. Select your domain to explore the collection.
+              {t.products.description}
             </p>
           </div>
         </div>
@@ -86,7 +89,7 @@ export function ProductsBentoGrid() {
           {categories.map(cat => (
             <button
               key={cat}
-              onClick={() => setActiveCat(cat)}
+              onClick={() => setActiveCat(cat as any)}
               className={`relative overflow-hidden group h-24 md:h-32 rounded-2xl md:rounded-[2rem] border-2 transition-all duration-700 flex flex-col md:flex-row items-center justify-center md:justify-between p-4 md:p-8 ${activeCat === cat
                   ? "bg-primary text-white border-primary shadow-2xl shadow-primary/20 scale-[1.01]"
                   : "bg-card text-foreground border-border/60 hover:border-primary/40 hover:bg-primary/5"
@@ -94,9 +97,11 @@ export function ProductsBentoGrid() {
             >
               <div className="relative z-10 flex flex-col items-center md:items-start text-center md:text-left gap-1">
                 <span className={`text-[10px] md:text-xs font-black uppercase tracking-[0.2em] ${activeCat === cat ? "text-white/70" : "text-primary/70"}`}>
-                  Explore
+                  {t.products.explore}
                 </span>
-                <span className="text-xl md:text-3xl font-heading font-black">{cat}</span>
+                <span className="text-xl md:text-3xl font-heading font-black">
+                  {cat === "Home" ? t.nav.homeowner : t.nav.commercial}
+                </span>
               </div>
 
               <div className={`hidden md:flex p-4 rounded-2xl transition-all duration-700 group-hover:scale-110 group-hover:rotate-6 ${activeCat === cat ? "bg-white/20" : "bg-primary/5 text-primary"}`}>
@@ -191,6 +196,15 @@ export function ProductsBentoGrid() {
 
 function BentoCard({ item, index, isMobile }: { item: typeof products[0] & { spans: string }, index: number, isMobile: boolean }) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const { currency, t } = useSettings();
+
+  const discountedPrice = item.basePrice * (1 - item.discountPercentage / 100);
+  const currentBasePrice = convertPrice(item.basePrice, currency);
+  const currentDiscountedPrice = convertPrice(discountedPrice, currency);
+
+  // Determine if the card is "large" or "small" for styling adjustments
+  const isLarge = item.spans.includes("col-span-2");
+  const isSquare = item.spans.includes("row-span-2");
 
   return (
     <motion.div
@@ -199,67 +213,83 @@ function BentoCard({ item, index, isMobile }: { item: typeof products[0] & { spa
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.04 }}
       whileHover="hover"
-      className={`relative rounded-xl md:rounded-[2rem] overflow-hidden bg-card border border-white/5 dark:border-white/10 shadow-sm group transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 ${isMobile ? 'col-span-1 row-span-1' : item.spans}`}
+      className={`relative rounded-xl md:rounded-[2.5rem] overflow-hidden bg-white dark:bg-zinc-900 border border-black/5 dark:border-white/5 shadow-lg group transition-all duration-700 hover:shadow-2xl hover:shadow-primary/10 ${isMobile ? 'col-span-1 row-span-1' : item.spans}`}
     >
-      {/* Dynamic Edge Highlight */}
-      <div className="absolute inset-0 z-10 p-[1px] bg-gradient-to-tr from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-xl md:rounded-[2rem] pointer-events-none" />
-
       {/* Background Asset */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 bg-zinc-100 dark:bg-zinc-800">
         <Image
           src={item.img}
           alt={item.title}
           fill
           onLoad={() => setIsLoaded(true)}
-          className={`object-cover transition-all duration-1000 ease-out group-hover:scale-110 opacity-70 group-hover:opacity-50 ${isLoaded ? 'blur-0' : 'blur-lg'}`}
+          className={`object-contain transition-all duration-1000 ease-out group-hover:scale-105 group-hover:-translate-y-4 ${
+            isMobile || !isLarge ? 'p-6' : 'p-12'
+          } ${isLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-lg'}`}
         />
-        {/* Stronger Bottom-Up Gradient for Readability */}
-        <div className="absolute inset-x-0 bottom-0 h-4/5 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-[1]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.05)_100%)] z-[1]" />
+      </div>
+
+      {/* Discount Badge */}
+      <div className={`absolute z-20 ${isMobile ? 'top-3 left-3' : 'top-6 left-6'}`}>
+        <div className="bg-primary text-white px-2 py-0.5 md:px-4 md:py-2 rounded-full text-[8px] md:text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20">
+          -{item.discountPercentage}%
+        </div>
       </div>
 
       {/* Content Engine */}
-      <div className="absolute inset-0 p-4 md:p-8 flex flex-col justify-end z-10">
-        <div className="mb-3 md:mb-6">
-          <motion.h3
-            className="text-lg md:text-3xl font-bold font-heading text-white mb-1 md:mb-2 leading-tight group-hover:text-primary transition-colors"
-          >
-            {item.title}
-          </motion.h3>
-          <p className="hidden md:block text-white/70 text-xs md:text-sm line-clamp-2 md:max-w-md pointer-events-none mb-4">
-            {item.desc}
-          </p>
-        </div>
-
-        {/* Premium Pricing & Savings Module */}
-        <div className="flex flex-col gap-2 md:gap-3 bg-white/5 backdrop-blur-2xl rounded-xl md:rounded-3xl p-3 md:p-6 border border-white/10 group-hover:border-primary/40 transition-all duration-500">
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[9px] md:text-xs font-black uppercase tracking-widest text-white/40">Efficiency</span>
-                <span className="h-[1px] w-4 bg-white/20" />
-              </div>
-              <div className="flex items-baseline gap-2 md:gap-4">
-                <span className="text-xl md:text-4xl font-heading font-black text-primary leading-none">
-                  {item.nowBill}
-                </span>
-                <span className="text-sm md:text-xl font-mono text-white/30 line-through decoration-primary/50 decoration-2">
-                  {item.prevBill}
-                </span>
-              </div>
+      <div className={`absolute inset-0 flex flex-col justify-end z-10 transition-all duration-500 ${
+        isMobile || !isLarge ? 'p-3' : 'p-6'
+      } group-hover:p-4`}>
+        {/* Info Module */}
+        <div className={`relative overflow-hidden bg-white/40 dark:bg-black/40 backdrop-blur-3xl rounded-2xl md:rounded-[2.5rem] border border-white/30 dark:border-white/10 group-hover:border-primary/50 transition-all duration-700 shadow-2xl ${
+          isMobile || !isLarge ? 'p-3 md:p-4' : 'p-6 md:p-8'
+        }`}>
+          <div className="flex flex-col gap-1 md:gap-2">
+            <div className={`flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] ${
+              isMobile || !isLarge ? 'text-[6px]' : 'text-[10px]'
+            }`}>
+              <span>{t.products.hardware}</span>
+              <div className="h-[0.5px] w-3 bg-primary/40" />
             </div>
             
-            <div className="flex flex-col items-end">
-              <div className="text-[9px] md:text-xs font-black uppercase tracking-widest text-primary/80 mb-1">Savings</div>
-              <div className="px-2 md:px-4 py-1 md:py-2 bg-primary text-white text-xs md:text-2xl font-black font-heading rounded-lg md:rounded-xl shadow-lg shadow-primary/20 rotate-1 group-hover:rotate-0 transition-transform">
-                {item.savings}
+            <motion.h3
+              className={`font-black font-heading text-foreground leading-[1.1] ${
+                isMobile || !isLarge ? 'text-xs md:text-xl' : 'text-xl md:text-4xl'
+              }`}
+            >
+              {item.title}
+            </motion.h3>
+
+            {isLarge && !isMobile && (
+              <p className="text-foreground/70 text-[10px] md:text-sm line-clamp-1 font-medium mt-1">
+                {item.desc}
+              </p>
+            )}
+
+            <div className="flex items-center justify-between mt-2 md:mt-4">
+              <div className="flex flex-col">
+                <span className={`font-black uppercase tracking-widest text-foreground/40 leading-none ${
+                  isMobile || !isLarge ? 'text-[5px]' : 'text-[8px]'
+                }`}>{t.products.price}</span>
+                <div className="flex items-baseline gap-2">
+                  <span className={`font-black font-heading text-primary leading-none ${
+                    isMobile || !isLarge ? 'text-sm md:text-2xl' : 'text-xl md:text-5xl'
+                  }`}>
+                    {formatPrice(currentDiscountedPrice, currency)}
+                  </span>
+                  <span className={`font-bold text-foreground/30 line-through decoration-primary/40 decoration-1 transition-all ${
+                    isMobile || !isLarge ? 'text-[8px] md:text-base' : 'text-xs md:text-2xl'
+                  } opacity-60`}>
+                    {formatPrice(currentBasePrice, currency)}
+                  </span>
+                </div>
               </div>
-            </div>
-          </div>
-          
-          <div className="hidden md:flex items-center justify-between pt-2 border-t border-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-            <span className="text-xs text-white/40 font-medium">Monthly Estimate</span>
-            <div className="flex items-center gap-2 text-primary font-bold text-sm">
-              Explore Specs <ArrowRight className="w-4 h-4" />
+              
+              <button className={`flex items-center justify-center bg-primary text-white transition-all shrink-0 hover:scale-105 active:scale-95 ${
+                isMobile || !isLarge ? 'w-8 h-8 md:w-10 md:h-10 rounded-lg' : 'w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl'
+              } shadow-lg shadow-primary/30`}>
+                <ArrowRight className={isMobile || !isLarge ? 'w-4 h-4' : 'w-6 h-6 md:w-8 md:h-8'} />
+              </button>
             </div>
           </div>
         </div>

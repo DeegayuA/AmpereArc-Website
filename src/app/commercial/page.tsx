@@ -52,7 +52,7 @@ export default function CommercialPage() {
           </div>
           <div className="relative h-[500px] rounded-3xl overflow-hidden bg-muted">
             <Image 
-              src="/assets/Hero_BG/Commercial.jpg" 
+              src="/assets/Hero_BG/commercial.png" 
               alt="Commercial Building" 
               fill 
               className="object-cover"

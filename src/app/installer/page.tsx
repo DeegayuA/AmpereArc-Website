@@ -22,7 +22,7 @@ export default function InstallerPage() {
         <div className="grid md:grid-cols-2 gap-12 items-center mb-24">
           <div className="relative h-[500px] rounded-3xl overflow-hidden bg-muted">
             <Image 
-              src="/assets/Hero_BG/Installer.jpeg" 
+              src="/assets/Hero_BG/installer.png" 
               alt="Installer working" 
               fill 
               className="object-cover"
