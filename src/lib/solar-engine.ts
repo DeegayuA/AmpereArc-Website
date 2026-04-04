@@ -186,7 +186,9 @@ export function calculateSystem(inputs: SystemInputs, allProducts: Product[]): S
   }
 
   const systemKwp = Math.round((panelCount * panelWp) / 100) / 10;
-  const requiredInverterKw = Math.max(systemKwp, inputs.instantPeakKw ?? 0);
+  // A standard solar inverter can handle up to 1.5x its rating in solar panels (DC/AC Oversizing ratio)
+  const inverterKwNeededForPanels = systemKwp / 1.5;
+  const requiredInverterKw = Math.max(inverterKwNeededForPanels, inputs.instantPeakKw ?? 0);
   const inverterCount = Math.max(1, Math.ceil(requiredInverterKw / inverterKw));
 
   // ── PANEL PRODUCT SELECTION ──────────────────────────────────────

@@ -6,7 +6,8 @@ export const subCategories = [
   "EV Chargers",
   "Smart Meters",
   "Solar Panels",
-  "Industrial Solutions"
+  "Industrial Solutions",
+  "Panel Boards"
 ];
 
 export interface Product {
@@ -158,6 +159,7 @@ export const products: Product[] = [
     img: "/assets/Products/AI-500w_Solar_Panel.png",
     className: "md:col-span-1 md:row-span-1",
     tags: ["residential", "ai-optimised", "efficiency", "monocrystalline"],
+    visible: false,
     metadata: { wp: 500 }
   },
   {
@@ -171,6 +173,7 @@ export const products: Product[] = [
     img: "/assets/Products/AI-720W_Solar_Panel.png",
     className: "md:col-span-2 md:row-span-1",
     tags: ["commercial", "high-power", "bifacial", "ai-optimised"],
+    visible: false,
     metadata: { wp: 720 }
   },
 
@@ -207,7 +210,7 @@ export const products: Product[] = [
     desc: "High-speed DC fast charging station with OCPP 1.6J support. Requires three-phase supply. Charges most EVs in under 2 hour.",
     category: "Home",
     subCategory: "EV Chargers",
-    basePrice: 580,
+    basePrice: 12000,
     discountPercentage: 10,
     img: "/assets/Products/AI-EV_Charger_7kw-22kw.png",
     className: "md:col-span-1 md:row-span-1",

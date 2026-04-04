@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { SystemDesign, MONTHS_SHORT } from "@/lib/solar-engine";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
   Sun, Battery, Zap, Car, TrendingUp, CalendarDays, RefreshCw,
@@ -35,10 +35,11 @@ export function SolarWizardResult({
   } = design;
 
   const monthlySavingsUsd = annualSavingsUsd / 12;
-  const maxGen = Math.max(...monthly.map(m => m.generationKwh));
+  const maxGen = Math.max(...monthly.map(m => m.generationKwh)) || 1;
   const totalAnnualBenefit = annualSavingsUsd + evFuelSavingsUsd;
 
   const [copied, setCopied] = useState(false);
+  const [showMoreInfo, setShowMoreInfo] = useState(false);
 
   const buildMessage = () => {
     return [
@@ -79,10 +80,10 @@ export function SolarWizardResult({
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
           <Zap className="w-3 h-3 fill-primary"/> {systemKwp}kWp High-Performance System
         </motion.div>
-        <h3 className="text-3xl lg:text-4xl font-black font-heading leading-tight">
-          Save <span className="text-primary">{fmtUsd(totalAnnualBenefit/12)}</span> /mo
+        <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black font-heading leading-tight break-words">
+          Achieve <span className="text-primary">Energy Freedom</span> & Save <span className="text-primary">{fmtUsd(totalAnnualBenefit/12)}</span> /mo
         </h3>
-        <p className="text-sm text-foreground/40 font-bold">{panelCount} Panels · {country.name} · {city}</p>
+        <p className="text-sm text-foreground/40 font-bold uppercase tracking-[0.1em]">{panelCount} High-Efficiency Panels · {city}, {country.name}</p>
       </div>
 
       {/* One-Click Contact Row */}
@@ -115,7 +116,7 @@ export function SolarWizardResult({
                 <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">EV Savings Impact</span>
               </div>
               <div>
-                <p className="text-4xl font-black font-heading text-emerald-600">{fmtUsd(evFuelSavingsUsd)}</p>
+                <p className="text-2xl sm:text-3xl xl:text-4xl font-black font-heading text-emerald-600 break-words">{fmtUsd(evFuelSavingsUsd)}</p>
                 <p className="text-xs font-bold text-foreground/40 mt-1">Annual Fuel Displacement</p>
               </div>
               <div className="p-3 bg-white/50 rounded-xl border border-emerald-500/10">
@@ -134,8 +135,8 @@ export function SolarWizardResult({
               <Gauge className="w-5 h-5 text-primary"/>
               <span className="text-[10px] font-black uppercase tracking-widest text-primary">Investment Returns</span>
             </div>
-            <div className="flex items-baseline gap-2">
-              <p className="text-4xl font-black font-heading text-primary">{breakEvenYears}</p>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <p className="text-3xl sm:text-4xl font-black font-heading text-primary break-words">{breakEvenYears}</p>
               <p className="text-sm font-bold text-foreground/40 uppercase">Years Break-Even</p>
             </div>
             <div className="relative h-2 bg-primary/10 rounded-full overflow-hidden">
@@ -146,6 +147,120 @@ export function SolarWizardResult({
           <p className="text-[11px] text-foreground/40 mt-4 italic font-medium">After {breakEvenYears} years, your electricity becomes 100% profit.</p>
         </div>
       </div>
+
+      {/* Technical Deep Dive Toggle */}
+      <div className="flex justify-center -mt-2">
+        <button 
+          onClick={() => setShowMoreInfo(!showMoreInfo)}
+          className="group flex items-center gap-2 px-6 py-3 rounded-2xl bg-secondary/10 border border-border/40 text-[10px] font-black uppercase tracking-widest hover:bg-primary/10 hover:border-primary/20 transition-all text-foreground/60 hover:text-primary"
+        >
+          {showMoreInfo ? "Hide Technical Details" : "View Full Seasonality & Specs"}
+          <TrendingUp className={`w-3 h-3 transition-transform duration-500 ${showMoreInfo ? 'rotate-180' : ''}`}/>
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {showMoreInfo && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden space-y-6"
+          >
+            {/* Environmental Impact Marketing */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 text-center">
+                <Sun className="w-6 h-6 text-emerald-500 mx-auto mb-2"/>
+                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-1">Carbon Avoided</p>
+                <p className="text-xl font-black">{Math.round(annualGenerationKwh * 0.4).toLocaleString()} kg</p>
+                <p className="text-[9px] text-foreground/40 font-bold mt-1">CO₂ emissions saved/yr</p>
+              </div>
+              <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 text-center">
+                <CalendarDays className="w-6 h-6 text-primary mx-auto mb-2"/>
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">Total Yield</p>
+                <p className="text-xl font-black">{(annualGenerationKwh * 25 / 1000).toFixed(1)} MWh</p>
+                <p className="text-[9px] text-foreground/40 font-bold mt-1">25-year lifetime generation</p>
+              </div>
+              <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-4 text-center">
+                <Zap className="w-6 h-6 text-amber-500 mx-auto mb-2"/>
+                <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 mb-1">Grid Independence</p>
+                <p className="text-xl font-black">{Math.min(100, Math.round((annualGenerationKwh / (annualGenerationKwh + (annualSavingsUsd/0.15))) * 100))}%</p>
+                <p className="text-[9px] text-foreground/40 font-bold mt-1">Annual energy autonomy</p>
+              </div>
+            </div>
+
+            {/* Detailed Monthly Table */}
+            <div className="bg-secondary/5 border border-border/40 rounded-3xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <TrendingUp className="w-4 h-4 text-primary"/>
+                <h4 className="text-xs font-black uppercase tracking-widest">Monthly Generation Breakdown</h4>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-[11px] border-collapse min-w-[400px]">
+                  <thead>
+                    <tr className="border-b border-border/20 text-foreground/40 font-black uppercase tracking-widest">
+                      <th className="py-2">Month</th>
+                      <th className="py-2">Sun Hours</th>
+                      <th className="py-2 text-right">Generation</th>
+                      <th className="py-2 text-right">Est. Savings</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monthly.map((m, i) => (
+                      <tr key={i} className="border-b border-border/10 last:border-0 hover:bg-white/5 transition-colors">
+                        <td className="py-2 font-black text-foreground/80">{m.month}</td>
+                        <td className="py-2 font-bold text-foreground/40">{m.peakSunHours}h / day</td>
+                        <td className="py-2 text-right font-black text-primary">{m.generationKwh.toLocaleString()} kWh</td>
+                        <td className="py-2 text-right font-black">{fmtUsd(m.savingsUsd)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Technical Hardware Specs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+               <div className="bg-background border border-border/40 rounded-2xl p-5 space-y-3">
+                 <div className="flex items-center gap-2 mb-2">
+                   <Sun className="w-4 h-4 text-primary"/>
+                   <span className="text-[10px] font-black uppercase tracking-widest">Panel Specifications</span>
+                 </div>
+                 <div className="flex justify-between text-[11px]">
+                   <span className="text-foreground/40 font-bold">Total Capacity</span>
+                   <span className="font-black text-foreground">{systemKwp} kWp</span>
+                 </div>
+                 <div className="flex justify-between text-[11px]">
+                   <span className="text-foreground/40 font-bold">Panel Area</span>
+                   <span className="font-black text-foreground">{(panelCount * 2.1).toFixed(1)} m²</span>
+                 </div>
+                 <div className="flex justify-between text-[11px]">
+                   <span className="text-foreground/40 font-bold">Module Quantity</span>
+                   <span className="font-black text-foreground">{panelCount} Units</span>
+                 </div>
+               </div>
+               <div className="bg-background border border-border/40 rounded-2xl p-5 space-y-3">
+                 <div className="flex items-center gap-2 mb-2">
+                   <Zap className="w-4 h-4 text-primary"/>
+                   <span className="text-[10px] font-black uppercase tracking-widest">Inverter Specs</span>
+                 </div>
+                 <div className="flex justify-between text-[11px]">
+                   <span className="text-foreground/40 font-bold">Output Phase</span>
+                   <span className="font-black text-foreground">{inverters.product.metadata.phases}-Phase</span>
+                 </div>
+                 <div className="flex justify-between text-[11px]">
+                   <span className="text-foreground/40 font-bold">Inverter Count</span>
+                   <span className="font-black text-foreground">{inverters.count} Unit(s)</span>
+                 </div>
+                 <div className="flex justify-between text-[11px]">
+                   <span className="text-foreground/40 font-bold">Efficiency</span>
+                   <span className="font-black text-foreground">98.5% (Max)</span>
+                 </div>
+               </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Seasonal Generation Chart */}
       <div className="bg-amber-500/5 border border-amber-500/20 rounded-3xl p-6">
@@ -176,26 +291,59 @@ export function SolarWizardResult({
         </div>
       </div>
 
-      {/* Component Breakdown */}
+      {/* Itemized Investment Quote */}
       <div className="space-y-3 pt-2">
-        <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40 px-1">System Components</p>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {[
-            { l: "Solar Panels", c: panelCount, p: panels.product, i: Sun },
-            { l: "Inverter", c: inverters.count, p: inverters.product, i: Zap },
-            batteries && { l: "Energy Storage", c: batteries.count, p: batteries.product, i: Battery },
-            evCharger && { l: "EV Charger", c: 1, p: evCharger.product, i: Car },
-          ].filter(Boolean).map((item: any, idx) => (
-            <div key={idx} className="bg-secondary/5 border border-border/40 rounded-2xl p-4 flex flex-col gap-3">
-              <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-background/50 border border-border/20 p-2">
-                <Image src={item.p.img} alt={item.p.title} fill className="object-contain"/>
-              </div>
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-foreground/30">{item.c}x {item.l}</p>
-                <p className="text-xs font-black truncate">{item.p.title}</p>
-              </div>
-            </div>
-          ))}
+        <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40 px-1">Detailed Cost Breakdown</p>
+        <div className="bg-secondary/5 border border-border/40 rounded-3xl overflow-hidden shadow-inner">
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full text-left border-collapse min-w-[500px]">
+              <thead>
+                <tr className="border-b border-border/40 text-[10px] font-black uppercase tracking-widest text-foreground/40 bg-background/50">
+                  <th className="p-5 rounded-tl-3xl">Component</th>
+                  <th className="p-5 text-center">Qty</th>
+                  <th className="p-5 text-right hidden sm:table-cell">Unit Price</th>
+                  <th className="p-5 text-right rounded-tr-3xl">Total</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                {[
+                  { l: "Solar Panels - " + panels.product.title, c: panels.count, u: panels.discountedUnitPriceUsd, t: panels.discountedTotalUsd },
+                  { l: "Inverter - " + inverters.product.title, c: inverters.count, u: inverters.discountedUnitPriceUsd, t: inverters.discountedTotalUsd },
+                  batteries && { l: "Energy Storage - " + batteries.product.title, c: batteries.count, u: batteries.discountedUnitPriceUsd, t: batteries.discountedTotalUsd },
+                  evCharger && { l: "EV Charger - " + evCharger.product.title, c: evCharger.count, u: evCharger.discountedUnitPriceUsd, t: evCharger.discountedTotalUsd },
+                ].filter(Boolean).map((item: any, i) => (
+                  <tr key={i} className="border-b border-border/20 last:border-0 hover:bg-background/40 transition-colors">
+                    <td className="p-4 px-5 font-bold text-foreground sm:max-w-none max-w-[150px] truncate" title={item.l}>{item.l}</td>
+                    <td className="p-4 px-5 text-center text-foreground/60 font-medium">x{item.c}</td>
+                    <td className="p-4 px-5 text-right text-foreground/60 hidden sm:table-cell">{fmtUsd(item.u)}</td>
+                    <td className="p-4 px-5 text-right font-black">{fmtUsd(item.t)}</td>
+                  </tr>
+                ))}
+                
+                {/* Installation & BOS */}
+                <tr className="border-t border-border/30 bg-background/30">
+                  <td colSpan={2} className="p-3 px-5 sm:hidden"></td>
+                  <td colSpan={3} className="p-3 px-5 text-right text-[10px] font-bold text-foreground/40 uppercase tracking-widest hidden sm:table-cell">Installation & Certification</td>
+                  <td className="p-3 px-5 sm:hidden text-right text-[10px] font-bold text-foreground/40 uppercase tracking-widest">Install</td>
+                  <td className="p-3 px-5 text-right font-black">{fmtUsd(costBreakdown.installation)}</td>
+                </tr>
+                <tr className="bg-background/30">
+                  <td colSpan={2} className="p-3 px-5 sm:hidden"></td>
+                  <td colSpan={3} className="p-3 px-5 text-right text-[10px] font-bold text-foreground/40 uppercase tracking-widest hidden sm:table-cell">Balance of Systems (Wiring/Mounts/Accessories)</td>
+                  <td className="p-3 px-5 sm:hidden text-right text-[10px] font-bold text-foreground/40 uppercase tracking-widest">B.O.S.</td>
+                  <td className="p-3 px-5 text-right font-black">{fmtUsd(costBreakdown.bos)}</td>
+                </tr>
+
+                {/* Final Total */}
+                <tr className="bg-primary/5 text-primary border-t-2 border-primary/20">
+                  <td colSpan={2} className="p-5 sm:hidden"></td>
+                  <td colSpan={3} className="p-5 text-right font-black text-xs uppercase tracking-widest hidden sm:table-cell">Net Investment Amount</td>
+                  <td className="p-5 sm:hidden text-right font-black text-xs uppercase tracking-widest">Total</td>
+                  <td className="p-5 text-right font-black text-xl">{fmtUsd(costBreakdown.discountedTotal)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -203,10 +351,10 @@ export function SolarWizardResult({
       <div className="bg-foreground text-background rounded-3xl p-8 relative overflow-hidden">
         <CalendarDays className="absolute -bottom-10 -right-10 w-48 h-48 text-background/5 -rotate-12"/>
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div className="space-y-2">
-            <h4 className="text-2xl font-black font-heading leading-tight">LIFETIME BENEFIT</h4>
-            <p className="text-5xl font-black font-heading text-primary">{fmtUsd(lifetimeSavings25Yr)}</p>
-            <p className="text-sm font-bold opacity-40">Net Profit over 25 years (inflation adjusted)</p>
+          <div className="space-y-2 max-w-full">
+            <h4 className="text-xl sm:text-2xl font-black font-heading leading-tight">LIFETIME BENEFIT</h4>
+            <p className="text-3xl sm:text-4xl lg:text-5xl font-black font-heading text-primary break-words">{fmtUsd(lifetimeSavings25Yr)}</p>
+            <p className="text-xs sm:text-sm font-bold opacity-40">Net Profit over 25 years (inflation adjusted)</p>
           </div>
           <div className="flex flex-col gap-3">
             <button onClick={shareWA} className="w-full bg-primary text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:scale-[1.02] transition-transform">

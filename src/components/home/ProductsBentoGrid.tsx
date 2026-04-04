@@ -124,7 +124,7 @@ export function ProductsBentoGrid() {
 
         {/* Sub-Category Chip Navigation */}
         <div className="flex overflow-x-auto pb-4 gap-3 scrollbar-hide mb-8 border-b border-border/40">
-          {subCategories.map(sub => (
+          {subCategories.filter(sub => sub !== "Solar Panels").map(sub => (
             <button
               key={sub}
               onClick={() => setActiveSub(sub)}

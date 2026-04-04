@@ -8,7 +8,7 @@ import {
   TrendingUp, Car, MapPin, ChevronRight, Loader2, Globe, Sun, User, Phone, Mail, CheckCircle2
 } from "lucide-react";
 import { products } from "@/lib/data";
-import { calculateSystem, getAvailableCountries, SystemDesign, SystemInputs } from "@/lib/solar-engine";
+import { calculateSystem, getAvailableCountries, getTariff, SystemDesign, SystemInputs } from "@/lib/solar-engine";
 import { currencies } from "@/lib/currency";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { SolarWizardResult } from "./SolarWizardResult";
@@ -21,13 +21,13 @@ const STEPS: { id: StepId; label: string }[] = [
   { id: "project",  label: "Property" },
   { id: "phase",    label: "Supply" },
   { id: "usage",    label: "Usage" },
+  { id: "roof",     label: "Roof" },
   { id: "peak_load",label: "Instant Power" },
   { id: "backup",   label: "Backup" },
   { id: "goal",     label: "Goal" },
   { id: "ev",       label: "EV & Range" },
   { id: "location", label: "Location" },
   { id: "contact",  label: "Contact" },
-  { id: "roof",     label: "Roof" },
   { id: "result",   label: "Results" },
 ];
 
@@ -64,6 +64,7 @@ const defaultAnswers = {
   roofAreaM2: null as number | null,
   roofOverridden: false,
   instantPeakKw: 2,
+  usageMode: "units" as "units" | "bill",
 };
 
 export function RecommendationModal({ isOpen, onClose }: Props) {
@@ -77,9 +78,21 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
   const [answers, setAnswers] = useState(defaultAnswers);
 
   useEffect(() => {
-    if (!isOpen || liveRates) return;
-    fetch("https://open.er-api.com/v6/latest/USD")
-      .then(r => r.json()).then(d => d.rates && setLiveRates(d.rates)).catch(() => {});
+    if (!isOpen) return;
+    if (!liveRates) {
+      fetch("https://open.er-api.com/v6/latest/USD")
+        .then(r => r.json()).then(d => d.rates && setLiveRates(d.rates)).catch(() => {});
+    }
+    
+    // Auto-detect location
+    fetch("https://ipapi.co/json/")
+      .then(r => r.json())
+      .then(d => {
+        if (d.country_code && !answers.city) {
+          set("countryCode", d.country_code);
+          set("city", d.city || "");
+        }
+      }).catch(() => {});
   }, [isOpen, liveRates]);
 
   const set = useCallback(<K extends keyof typeof defaultAnswers>(k: K, v: typeof defaultAnswers[K]) =>
@@ -147,6 +160,17 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
     try { return new Intl.NumberFormat("en", { style: "currency", currency, maximumFractionDigits: 0 }).format(local); }
     catch { return `${cur?.symbol ?? "$"}${Math.round(local).toLocaleString()}`; }
   };
+
+  const tariff = getTariff(answers.countryCode);
+  const exchangeRate = liveRates?.[currency] ?? 1;
+  const unitPriceLocal = (tariff?.tariff_usd ?? 0.15) * exchangeRate;
+  
+  const setUsageFromBill = (billLocal: number) => {
+    const units = Math.round(billLocal / (unitPriceLocal || 1));
+    set("monthlyUsageKwh", units);
+  };
+
+  const billFromUsage = Math.round(answers.monthlyUsageKwh * unitPriceLocal);
 
   return (
     <AnimatePresence>
@@ -248,18 +272,50 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
 
                     {/* ── USAGE ── */}
                     {step==="usage"&&(
-                      <Wrap title="Monthly Usage" sub="Enter your average monthly electricity bill (units)." onBack={()=>go(answers.isCommercial?"project":"phase",false)}>
+                      <Wrap title="Energy Profile" sub="How much electricity do you consume?" onBack={()=>go(answers.isCommercial?"project":"phase",false)}>
                         <div className="space-y-6">
-                           <div className="bg-secondary/5 border border-border/50 rounded-2xl p-6 text-center">
-                            <input type="number" 
-                                value={answers.monthlyUsageKwh}
-                                onFocus={e => e.target.select()}
-                                onChange={e=>set("monthlyUsageKwh", Math.max(0, parseInt(e.target.value)||0))}
-                                className="w-full text-center text-6xl font-black font-heading bg-transparent outline-none text-primary"/>
-                            <p className="text-xl font-bold text-foreground/40 mt-2">kWh per Month</p>
+                           {/* Mode Toggle */}
+                           <div className="flex p-1 bg-secondary/5 border border-border/50 rounded-2xl">
+                             <button onClick={()=>set("usageMode","units")} 
+                               className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${answers.usageMode==="units"?"bg-background shadow-xl text-primary":"text-foreground/40"}`}>
+                               Units (kWh)
+                             </button>
+                             <button onClick={()=>set("usageMode","bill")} 
+                               className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${answers.usageMode==="bill"?"bg-background shadow-xl text-primary":"text-foreground/40"}`}>
+                               Bill Amount ({currency})
+                             </button>
+                           </div>
+
+                           <div className="bg-secondary/5 border border-border/50 rounded-2xl p-6 text-center group">
+                            {answers.usageMode === "units" ? (
+                              <>
+                                <input type="number" 
+                                    value={answers.monthlyUsageKwh}
+                                    onFocus={e => e.target.select()}
+                                    onChange={e=>set("monthlyUsageKwh", Math.max(0, parseInt(e.target.value)||0))}
+                                    className="w-full text-center text-6xl font-black font-heading bg-transparent outline-none text-primary"/>
+                                <p className="text-xl font-bold text-foreground/40 mt-2">kWh per Month</p>
+                                <p className="text-[10px] font-black text-foreground/20 uppercase tracking-widest mt-1 italic">
+                                  ~ {fmtUsd(billFromUsage/exchangeRate)} Est. Monthly Bill
+                                </p>
+                              </>
+                            ) : (
+                              <>
+                                <input type="number" 
+                                    value={billFromUsage}
+                                    onFocus={e => e.target.select()}
+                                    onChange={e=>setUsageFromBill(Math.max(0, parseInt(e.target.value)||0))}
+                                    className="w-full text-center text-6xl font-black font-heading bg-transparent outline-none text-primary"/>
+                                <p className="text-xl font-bold text-foreground/40 mt-2">{currency} per Month</p>
+                                <p className="text-[10px] font-black text-foreground/20 uppercase tracking-widest mt-1 italic">
+                                  ~ {answers.monthlyUsageKwh} kWh Energy Consumption
+                                </p>
+                              </>
+                            )}
                           </div>
+
                           <div>
-                            <input type="range" min={50} max={answers.isCommercial?5000:1500}
+                            <input type="range" min={5} max={answers.isCommercial?5000:1500}
                                value={answers.monthlyUsageKwh}
                                onChange={e=>set("monthlyUsageKwh", parseInt(e.target.value))}
                                className="w-full accent-primary"/>
@@ -272,14 +328,14 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
                               </p>
                             </div>
                           </div>
-                          <NavBtn onClick={()=>go("peak_load")}/>
+                          <NavBtn onClick={()=>go("roof")}/>
                         </div>
                       </Wrap>
                     )}
 
                     {/* ── PEAK LOAD ── */}
                     {step==="peak_load"&&(
-                      <Wrap title="Peak Instant Power" sub="What are your highest simultaneous loads?" onBack={()=>go("usage",false)}>
+                      <Wrap title="Peak Instant Power" sub="What are your highest simultaneous loads?" onBack={()=>go("roof",false)}>
                         <div className="space-y-6">
                            <div className="bg-secondary/5 border border-border/50 rounded-2xl p-6 text-center">
                             <input type="number" 
@@ -446,14 +502,14 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
                              <input type="email" placeholder="Email Address" value={answers.email} onChange={e=>set("email", e.target.value)}
                                className="w-full pl-11 pr-4 py-4 bg-secondary/5 border border-border/50 rounded-2xl text-sm font-bold outline-none focus:border-primary"/>
                            </div>
-                           <NavBtn disabled={!answers.name || !answers.phone} onClick={()=>go("roof")}/>
+                           <NavBtn disabled={!answers.name || !answers.phone || isCalc} onClick={runCalc} label={isCalc ? "Processing..." : "Generate Final Quote"}/>
                            {!answers.name && <p className="text-[10px] text-center text-foreground/30">Name and phone are required to continue.</p>}
                         </div>
                       </Wrap>
                     )}
 
                     {/* ── ROOF ── */}
-                    {step==="roof"&&<RoofStep answers={answers} set={set} onBack={()=>go("contact",false)} onNext={runCalc} isCalc={isCalc}/>}
+                    {step==="roof"&&<RoofStep answers={answers} set={set} onBack={()=>go("usage",false)} onNext={()=>go("peak_load")} isCalc={false}/>}
 
                     {/* ── RESULT ── */}
                     {step==="result"&&(
@@ -566,9 +622,9 @@ function RoofStep({answers,set,onBack,onNext,isCalc}:any){
             onChange={e=>{set("roofAreaM2",parseInt(e.target.value));set("roofOverridden",true);}}
             className={`w-full accent-amber-500 ${isCritical ? "accent-red-500" : isLow ? "accent-orange-500" : "accent-amber-500"}`}/>
         
-        <button onClick={onNext} disabled={isCalc || isCritical}
+        <button onClick={onNext} disabled={isCritical}
           className={`w-full font-black uppercase tracking-widest text-xs py-5 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 disabled:opacity-50 ${isCritical ? "bg-red-500 text-white cursor-not-allowed" : "bg-primary text-white shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]"}`}>
-          {isCalc ? <><Loader2 className="w-4 h-4 animate-spin"/>Creating Design…</> : isCritical ? "Roof Not Enough" : <>Get My Solar Quote <ChevronRight className="w-5 h-5"/></>}
+          {isCritical ? "Roof Not Enough" : <>Continue to Peak Load <ChevronRight className="w-5 h-5"/></>}
         </button>
       </div>
     </Wrap>

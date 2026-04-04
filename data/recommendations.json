@@ -55,5 +55,38 @@
       "roofAreaM2": null,
       "roofOverridden": false
     }
+  },
+  {
+    "id": "AA-1775290404456-694",
+    "timestamp": "2026-04-04T08:13:24.457Z",
+    "contact": {
+      "name": "jjj",
+      "phone": "777",
+      "email": "888"
+    },
+    "location": {
+      "city": "London",
+      "country": "GB"
+    },
+    "answers": {
+      "isCommercial": false,
+      "isThreePhase": false,
+      "monthlyUsageKwh": 554,
+      "needsBackup": false,
+      "backupHours": 8,
+      "goalMaxIncome": false,
+      "offGrid": false,
+      "needsEV": false,
+      "evChargingKw": 7,
+      "evKmPerDay": 40,
+      "name": "jjj",
+      "phone": "777",
+      "email": "888",
+      "city": "London",
+      "countryCode": "GB",
+      "roofAreaM2": 21,
+      "roofOverridden": false,
+      "instantPeakKw": 5
+    }
   }
 ]
