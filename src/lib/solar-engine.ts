@@ -23,8 +23,8 @@ const SYSTEM_EFFICIENCY = 0.78;
 const DEFAULT_DOD = 0.8; // depth of discharge for batteries
 
 export const PANEL_SPECS = {
-  Home:       { wp: 500, area_m2: 2.10 }, // AmpereArc 500W AI panel
-  Commercial: { wp: 720, area_m2: 2.55 }, // AmpereArc 720W AI bifacial panel
+  Home:       { wp: 500, area_m2: 2.10 }, 
+  Commercial: { wp: 720, area_m2: 2.55 }, 
 };
 
 export function getAvailableCountries() {
@@ -49,6 +49,7 @@ export interface SystemInputs {
   countryCode: string;
   roofAreaM2: number | null;  // null = auto-calculate
   instantPeakKw?: number;     // New: Max simultaneous peak demand
+  selectedBatteryId?: string; // New: Manual selection
 }
 
 export interface ProductSelection {
@@ -129,7 +130,10 @@ export function calculateSystem(inputs: SystemInputs, allProducts: Product[]): S
 
   let batteries: ProductSelection | null = null;
   if (needsBattery && battPool.length) {
-    const batt = battPool[0];
+    const batt = inputs.selectedBatteryId 
+      ? (allProducts.find(p => p.id === inputs.selectedBatteryId) || battPool[0])
+      : battPool[0];
+
     const dod = batt.metadata.dod ?? DEFAULT_DOD;
     let batteryKwhNeeded: number;
     if (offGrid) {

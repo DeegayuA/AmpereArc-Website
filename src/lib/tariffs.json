@@ -7,8 +7,8 @@
     "export_rate_usd": 0.15,
     "fuel_price_usd": 1.80,
     "seasonal": true,
-    "installation_multiplier": 0.18,
-    "bos_multiplier": 0.10,
+    "installation_multiplier": 0.28,
+    "bos_multiplier": 0.15,
     "monthly_peak_sun_hours": [1.0, 1.8, 2.7, 4.0, 5.0, 5.5, 5.2, 4.8, 3.5, 2.0, 1.2, 0.8]
   },
   "DE": {
@@ -18,8 +18,8 @@
     "export_rate_usd": 0.086,
     "fuel_price_usd": 1.90,
     "seasonal": true,
-    "installation_multiplier": 0.18,
-    "bos_multiplier": 0.10,
+    "installation_multiplier": 0.28,
+    "bos_multiplier": 0.15,
     "monthly_peak_sun_hours": [1.4, 2.0, 3.2, 4.5, 5.5, 6.0, 5.8, 5.3, 4.0, 2.5, 1.5, 1.1]
   },
   "FR": {
@@ -40,8 +40,8 @@
     "export_rate_usd": 0.10,
     "fuel_price_usd": 0.95,
     "seasonal": false,
-    "installation_multiplier": 0.15,
-    "bos_multiplier": 0.09,
+    "installation_multiplier": 0.22,
+    "bos_multiplier": 0.14,
     "monthly_peak_sun_hours": [3.5, 4.0, 4.8, 5.5, 6.0, 6.5, 6.5, 6.2, 5.8, 5.0, 4.0, 3.3]
   },
     "LK": {
@@ -51,8 +51,8 @@
     "export_rate_usd": 0.069,
     "fuel_price_usd": 1.10,
     "seasonal": false,
-    "installation_multiplier": 0.12,
-    "bos_multiplier": 0.08,
+    "installation_multiplier": 0.18,
+    "bos_multiplier": 0.12,
     "monthly_peak_sun_hours": [5.5, 5.7, 6.0, 5.8, 5.5, 5.2, 5.0, 5.1, 5.3, 5.5, 5.5, 5.3]
   },
   "IN": {

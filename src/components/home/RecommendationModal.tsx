@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
   X, ArrowLeft, Home, Building2, Zap, Battery, Shield,
-  TrendingUp, Car, MapPin, ChevronRight, Loader2, Globe, Sun, User, Phone, Mail, CheckCircle2
+  TrendingUp, Car, MapPin, ChevronRight, Loader2, Globe, Sun, User, Phone, Mail, CheckCircle2, ChevronUp, ShoppingCart
 } from "lucide-react";
 import { products } from "@/lib/data";
 import { calculateSystem, getAvailableCountries, getTariff, SystemDesign, SystemInputs } from "@/lib/solar-engine";
@@ -13,7 +14,12 @@ import { currencies } from "@/lib/currency";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { SolarWizardResult } from "./SolarWizardResult";
 
-interface Props { isOpen: boolean; onClose: () => void; }
+interface Props { 
+  isOpen: boolean; 
+  onClose: () => void;
+  quickUsageKwh?: number;
+  quickEvKm?: number;
+}
 
 type StepId = "project"|"phase"|"usage"|"peak_load"|"backup"|"goal"|"ev"|"location"|"contact"|"roof"|"result";
 
@@ -65,9 +71,10 @@ const defaultAnswers = {
   roofOverridden: false,
   instantPeakKw: 2,
   usageMode: "units" as "units" | "bill",
+  selectedBatteryId: "" as string,
 };
 
-export function RecommendationModal({ isOpen, onClose }: Props) {
+export function RecommendationModal({ isOpen, onClose, quickUsageKwh, quickEvKm }: Props) {
   const { currency } = useSettings();
   const [step, setStep] = useState<StepId>("project");
   const [dir, setDir] = useState(1);
@@ -76,6 +83,32 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
   const [isCalc, setIsCalc] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState("AI Design Engine initializing...");
   const [answers, setAnswers] = useState(defaultAnswers);
+  const [liveDesign, setLiveDesign] = useState<SystemDesign | null>(null);
+  const [showLiveSummary, setShowLiveSummary] = useState(false);
+
+  // --- Real-time Design Engine ---
+  useEffect(() => {
+    const inputs: SystemInputs = {
+      monthlyUsageKwh: answers.monthlyUsageKwh,
+      isCommercial: answers.isCommercial,
+      isThreePhase: answers.isThreePhase,
+      needsBackup: answers.needsBackup || answers.offGrid,
+      backupHours: answers.backupHours,
+      goalMaxIncome: answers.goalMaxIncome,
+      offGrid: answers.offGrid,
+      needsEV: answers.needsEV,
+      evChargingKw: answers.evChargingKw,
+      evKmPerDay: answers.evKmPerDay,
+      countryCode: answers.countryCode,
+      roofAreaM2: answers.roofOverridden ? answers.roofAreaM2 : null,
+      instantPeakKw: answers.instantPeakKw,
+      selectedBatteryId: answers.selectedBatteryId,
+    };
+    try {
+      const design = calculateSystem(inputs, products);
+      setLiveDesign(design);
+    } catch(e) {}
+  }, [answers, products]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -84,16 +117,60 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
         .then(r => r.json()).then(d => d.rates && setLiveRates(d.rates)).catch(() => {});
     }
     
-    // Auto-detect location
-    fetch("https://ipapi.co/json/")
-      .then(r => r.json())
-      .then(d => {
-        if (d.country_code && !answers.city) {
-          set("countryCode", d.country_code);
-          set("city", d.city || "");
+    // Auto-detect location & Trigger Quick Calcs
+    const fetchIP = async () => {
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+        if (data.country_code) {
+          setAnswers(prev => ({ 
+            ...prev, 
+            countryCode: data.country_code, 
+            city: data.city || "" 
+          }));
+          return data;
         }
-      }).catch(() => {});
-  }, [isOpen, liveRates]);
+      } catch (e) {
+        // Fallback to ip-api
+        try {
+          const res = await fetch("http://ip-api.com/json/");
+          const data = await res.json();
+          if (data.countryCode) {
+            setAnswers(prev => ({ 
+              ...prev, 
+              countryCode: data.countryCode, 
+              city: data.city || "" 
+            }));
+            return data;
+          }
+        } catch(e2) {}
+      }
+      return null;
+    };
+
+    const init = async () => {
+      const loc = await fetchIP();
+      if (quickUsageKwh !== undefined) {
+         setAnswers(prev => ({
+          ...prev,
+          monthlyUsageKwh: quickUsageKwh,
+          needsEV: (quickEvKm ?? 0) > 0,
+          evKmPerDay: quickEvKm ?? 40,
+          isCommercial: false,
+          isThreePhase: false,
+          needsBackup: false,
+          usageMode: "bill",
+          // Use the detected location if it returns, else preserve default
+          countryCode: loc?.country_code || loc?.countryCode || prev.countryCode,
+          city: loc?.city || prev.city
+        }));
+        // Small delay to ensure state propagates before calc starts
+        setTimeout(() => runCalc(), 100);
+      }
+    };
+
+    init();
+  }, [isOpen, quickUsageKwh]);
 
   const set = useCallback(<K extends keyof typeof defaultAnswers>(k: K, v: typeof defaultAnswers[K]) =>
     setAnswers(prev => ({ ...prev, [k]: v })), []);
@@ -131,6 +208,7 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
       countryCode: answers.countryCode,
       roofAreaM2: answers.roofOverridden ? answers.roofAreaM2 : null,
       instantPeakKw: answers.instantPeakKw,
+      selectedBatteryId: answers.selectedBatteryId,
     };
     
     setLoadingMsg("Analyzing roof spatial footprint...");
@@ -149,6 +227,8 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
     setIsCalc(false);
     go("result");
   };
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   const stepIdx = STEPS.findIndex(s => s.id === step);
   const countries = getAvailableCountries();
@@ -172,39 +252,42 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
 
   const billFromUsage = Math.round(answers.monthlyUsageKwh * unitPriceLocal);
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-2 sm:p-4">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-2 sm:p-5 lg:p-10 pointer-events-none">
+          {/* OVERLAY - Uses pointer-events-auto to block background */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={onClose} className="absolute inset-0 bg-black/70 backdrop-blur-xl" />
+            onClick={onClose} 
+            className="absolute inset-0 bg-black/80 backdrop-blur-2xl pointer-events-auto" 
+          />
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 24 }}
+            initial={{ opacity: 0, scale: 0.95, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 24 }}
-            transition={{ type: "spring", stiffness: 280, damping: 30 }}
-            className="relative w-full max-w-5xl max-h-[95dvh] flex flex-col lg:flex-row bg-background rounded-3xl shadow-2xl overflow-hidden border border-white/10"
+            exit={{ opacity: 0, scale: 0.95, y: 40 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="relative w-full max-w-[95vw] lg:max-w-7xl max-h-[92dvh] flex flex-col lg:flex-row bg-background rounded-[2.5rem] shadow-[0_0_100px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10 pointer-events-auto"
           >
             {/* LEFT SIDEBAR */}
-            <div className="hidden lg:flex flex-col w-60 shrink-0 bg-gradient-to-b from-primary to-primary/80 p-7 relative overflow-hidden">
+            <div className="hidden lg:flex flex-col w-96 shrink-0 bg-gradient-to-br from-primary via-primary to-primary/80 p-12 relative overflow-hidden">
               <div className="absolute inset-0 pointer-events-none opacity-[0.07]">
                 {Array.from({length:96}).map((_,i)=><div key={i} className="inline-block w-2 h-2 rounded-full bg-white m-1.5"/>)}
               </div>
               <div className="relative z-10 flex flex-col h-full">
-                <div className="mb-7">
-                  <p className="text-white/50 text-[10px] font-black uppercase tracking-widest mb-1">AmpereArc</p>
-                  <h2 className="text-white font-black font-heading text-lg leading-snug">Solar Solution<br/>Wizard</h2>
+                <div className="mb-12">
+                  <p className="text-white/50 text-xs font-black uppercase tracking-[0.3em] mb-2">AmpereArc</p>
+                  <h2 className="text-white font-black font-heading text-4xl leading-tight">Solar Solution<br/>Wizard</h2>
                 </div>
-                <div className="space-y-1.5 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                <div className="space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar">
                   {STEPS.filter(s=>s.id!=="result").map((s,i)=>{
                     const done=stepIdx>i, active=s.id===step;
                     return (
-                      <div key={s.id} className={`flex items-center gap-3 py-1 transition-all ${active?"opacity-100":done?"opacity-55":"opacity-25"}`}>
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-black shrink-0 transition-all ${active?"bg-white text-primary scale-110":done?"bg-white/30 text-white":"border border-white/30 text-white/50"}`}>
+                      <div key={s.id} className={`flex items-center gap-4 py-1.5 transition-all ${active?"opacity-100":done?"opacity-55":"opacity-25"}`}>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 transition-all ${active?"bg-white text-primary scale-110 shadow-lg shadow-white/20":done?"bg-white/30 text-white":"border border-white/30 text-white/50"}`}>
                           {done?"✓":i+1}
                         </div>
-                        <span className={`text-[11px] font-bold ${active?"text-white":"text-white/60"}`}>{s.label}</span>
+                        <span className={`text-xs font-bold tracking-wide ${active?"text-white":"text-white/60"}`}>{s.label}</span>
                       </div>
                     );
                   })}
@@ -382,14 +465,42 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
                             <Card icon={Sun} title="Off-Grid" desc="100% Independent" note="No grid connection required." selected={answers.offGrid} onClick={()=>{set("offGrid",true);set("needsBackup",false);}}/>
                           </Grid3>
                           {(answers.needsBackup || answers.offGrid) && (
-                            <motion.div initial={{opacity:0, scale:0.95}} animate={{opacity:1, scale:1}} className="p-5 bg-primary/5 rounded-2xl border border-primary/20 mt-4">
-                              <p className="text-sm font-black mb-3">Autonomy Duration</p>
-                              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                                {BACKUP_OPTIONS.map(o=>(
-                                  <button key={o.hours} onClick={()=>set("backupHours",o.hours)} className={`p-3 rounded-xl border text-center ${answers.backupHours===o.hours?"bg-primary text-white":"bg-white border-border/50 text-foreground"}`}>
-                                    <span className="block font-black text-xs">{o.label}</span>
-                                  </button>
-                                ))}
+                            <motion.div initial={{opacity:0, scale:0.95}} animate={{opacity:1, scale:1}} className="p-5 bg-primary/5 rounded-2xl border border-primary/20 mt-4 space-y-6">
+                              <div>
+                                <p className="text-sm font-black mb-3">1. Select Backup Duration</p>
+                                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                                  {BACKUP_OPTIONS.map(o=>(
+                                    <button key={o.hours} onClick={()=>set("backupHours",o.hours)} className={`p-3 rounded-xl border text-center transition-all ${answers.backupHours===o.hours?"bg-primary text-white":"bg-white border-border/50 text-foreground"}`}>
+                                      <span className="block font-black text-xs">{o.label}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div>
+                                <p className="text-sm font-black mb-3">2. Choose Your Battery Storage</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  {products
+                                    .filter(p => p.subCategory === 'BESS (Battery Energy Storage)' && p.category === (answers.isCommercial ? 'Commercial' : 'Home'))
+                                    .map(p => {
+                                      const selected = answers.selectedBatteryId === p.id || (!answers.selectedBatteryId && p.id === (answers.isCommercial ? "c-bess-50kwh" : "h-bess-16.8kwh"));
+                                      return (
+                                        <button key={p.id} onClick={() => set("selectedBatteryId", p.id)}
+                                          className={`flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all ${selected ? "border-primary bg-primary/5" : "border-border/50 bg-white hover:border-primary/30"}`}>
+                                          <div className="w-12 h-12 relative rounded-lg overflow-hidden bg-secondary/10 shrink-0">
+                                            <Image src={p.img} alt={p.title} fill className="object-cover"/>
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <p className={`text-xs font-black font-heading truncate ${selected ? "text-primary" : ""}`}>{p.title}</p>
+                                            <p className="text-[10px] font-bold text-foreground/40">{p.metadata.kwh}kWh LFP</p>
+                                            <p className="text-[11px] font-black mt-1">{fmtUsd(p.basePrice * (1 - p.discountPercentage/100))}</p>
+                                          </div>
+                                          {selected && <CheckCircle2 className="w-5 h-5 text-primary shrink-0"/>}
+                                        </button>
+                                      );
+                                    })
+                                  }
+                                </div>
                               </div>
                               <NavBtn className="mt-4" onClick={()=>go("goal")}/>
                             </motion.div>
@@ -551,11 +662,78 @@ export function RecommendationModal({ isOpen, onClose }: Props) {
                   </motion.div>
                 </AnimatePresence>
               </div>
+
+              {/* LIVE SUMMARY FOOTER */}
+              {step !== "project" && step !== "result" && liveDesign && (
+                <div className="shrink-0 border-t border-border/50 bg-secondary/5 backdrop-blur-md relative z-[1001]">
+                   <AnimatePresence>
+                     {showLiveSummary && (
+                       <motion.div 
+                         initial={{ height: 0, opacity: 0 }} 
+                         animate={{ height: "auto", opacity: 1 }} 
+                         exit={{ height: 0, opacity: 0 }}
+                         className="overflow-hidden bg-background border-b border-border/50"
+                       >
+                         <div className="p-6 space-y-4">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Current System Configuration</h4>
+                              <span className="text-[10px] font-black uppercase text-primary">Live Update</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                               <SummaryItem label="Solar Yield" value={`${liveDesign.systemKwp} kWp`} sub={`${liveDesign.panelCount} Panels`}/>
+                               <SummaryItem label="Inverter" value={`${liveDesign.inverters.count}x`} sub={liveDesign.inverters.product.title}/>
+                               {liveDesign.batteries && <SummaryItem label="Storage" value={liveDesign.batteries.product.metadata.kwh + "kWh"} sub={liveDesign.batteries.product.title}/>}
+                               {liveDesign.evCharger && <SummaryItem label="EV Smart" value="Enabled" sub={liveDesign.evCharger.product.title}/>}
+                            </div>
+                         </div>
+                       </motion.div>
+                     )}
+                   </AnimatePresence>
+                   
+                   <div className="flex items-center justify-between p-4 px-6 lg:px-9">
+                      <button 
+                        onClick={() => setShowLiveSummary(!showLiveSummary)}
+                        className="flex items-center gap-3 group"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                          <ShoppingCart className="w-5 h-5"/>
+                        </div>
+                        <div className="text-left">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40 leading-none mb-1">Your Estimate</p>
+                          <div className="flex items-center gap-2">
+                             <span className="font-black font-heading text-lg leading-none">{fmtUsd(liveDesign.costBreakdown.discountedTotal)}</span>
+                             <ChevronUp className={`w-4 h-4 transition-transform duration-300 ${showLiveSummary ? 'rotate-180' : ''}`}/>
+                          </div>
+                        </div>
+                      </button>
+                      <div className="flex gap-2">
+                         <span className="hidden sm:inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 text-[9px] font-black uppercase tracking-tighter border border-emerald-500/20">
+                           {liveDesign.breakEvenYears} Year Break-Even
+                         </span>
+                      </div>
+                   </div>
+                </div>
+              )}
             </div>
           </motion.div>
         </div>
       )}
     </AnimatePresence>
+  );
+
+  if (!mounted) return null;
+  return createPortal(modalContent, document.body);
+}
+
+function SummaryItem({label, value, sub}: {label: string, value: string, sub: string}) {
+  return (
+    <div className="flex items-center gap-3 p-3 rounded-xl border border-border/40 bg-secondary/5">
+       <div className="flex-1">
+         <p className="text-[9px] font-black uppercase tracking-widest text-foreground/40">{label}</p>
+         <p className="text-xs font-black truncate">{value}</p>
+         <p className="text-[10px] text-foreground/50 truncate font-medium">{sub}</p>
+       </div>
+    </div>
   );
 }
 

@@ -195,21 +195,21 @@ export function SolarWizardResult({
                 <TrendingUp className="w-4 h-4 text-primary"/>
                 <h4 className="text-xs font-black uppercase tracking-widest">Monthly Generation Breakdown</h4>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-[11px] border-collapse min-w-[400px]">
+              <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-border hover:scrollbar-thumb-primary/50">
+                <table className="w-full text-left text-[11px] border-collapse min-w-[300px]">
                   <thead>
                     <tr className="border-b border-border/20 text-foreground/40 font-black uppercase tracking-widest">
                       <th className="py-2">Month</th>
-                      <th className="py-2">Sun Hours</th>
+                      <th className="py-2">Daily Sun</th>
                       <th className="py-2 text-right">Generation</th>
-                      <th className="py-2 text-right">Est. Savings</th>
+                      <th className="py-2 text-right">Savings</th>
                     </tr>
                   </thead>
                   <tbody>
                     {monthly.map((m, i) => (
                       <tr key={i} className="border-b border-border/10 last:border-0 hover:bg-white/5 transition-colors">
                         <td className="py-2 font-black text-foreground/80">{m.month}</td>
-                        <td className="py-2 font-bold text-foreground/40">{m.peakSunHours}h / day</td>
+                        <td className="py-2 font-black text-foreground/40">{m.peakSunHours}h</td>
                         <td className="py-2 text-right font-black text-primary">{m.generationKwh.toLocaleString()} kWh</td>
                         <td className="py-2 text-right font-black">{fmtUsd(m.savingsUsd)}</td>
                       </tr>
@@ -264,30 +264,33 @@ export function SolarWizardResult({
 
       {/* Seasonal Generation Chart */}
       <div className="bg-amber-500/5 border border-amber-500/20 rounded-3xl p-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8">
            <div className="flex items-center gap-2">
-             <TrendingUp className="w-5 h-5 text-amber-600"/>
-             <span className="text-[10px] font-black uppercase tracking-widest text-amber-600">Seasonal Production</span>
+             <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"/>
+             <span className="text-[10px] font-black uppercase tracking-widest text-amber-600">Seasonal Production Breakdown</span>
            </div>
-           <p className="text-xs font-bold text-foreground/50">{annualGenerationKwh.toLocaleString()} kWh / Year</p>
+           <p className="text-[10px] font-black text-foreground/40 uppercase tracking-widest">{annualGenerationKwh.toLocaleString()} kWh Projected / Yr</p>
         </div>
-        <div className="flex items-end justify-between h-36 gap-1 md:gap-2">
-           {monthly.map((m, i) => (
-             <div key={i} className="flex-1 flex flex-col items-center gap-2 group relative">
-               <div className="absolute -top-6 opacity-0 group-hover:opacity-100 transition-opacity bg-background border border-border/50 text-[10px] font-bold px-2 py-1 rounded-lg z-10 whitespace-nowrap shadow-xl">
-                 {fmtUsd(m.savingsUsd)} savings
+        <div className="flex items-end justify-between h-40 gap-1 md:gap-3">
+           {monthly.map((m, i) => {
+             const hPercent = Math.max(8, (m.generationKwh / maxGen) * 100);
+             return (
+               <div key={i} className="flex-1 flex flex-col items-center gap-3 group relative h-full justify-end">
+                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-foreground text-background text-[9px] font-black px-2 py-1 rounded-md z-20 whitespace-nowrap shadow-xl scale-90 group-hover:scale-100">
+                   {fmtUsd(m.savingsUsd)} savings
+                 </div>
+                 <div className="w-full relative bg-amber-500/5 rounded-t-xl rounded-b-md flex items-end overflow-hidden h-full border border-amber-500/10">
+                    <motion.div 
+                      initial={{ height: 0 }}
+                      animate={{ height: `${hPercent}%` }}
+                      transition={{ delay: i * 0.05, type: "spring", stiffness: 50, damping: 15 }}
+                      className="w-full bg-gradient-to-t from-amber-600 via-amber-500 to-amber-400 group-hover:from-primary group-hover:to-amber-500 transition-all duration-500"
+                    />
+                 </div>
+                 <span className="text-[9px] font-black uppercase text-foreground/30 group-hover:text-amber-600 transition-colors">{m.month}</span>
                </div>
-               <div className="w-full relative bg-amber-500/10 rounded-t-md rounded-b-sm flex items-end overflow-hidden h-full">
-                  <motion.div 
-                    initial={{ height: 0 }}
-                    animate={{ height: `${(m.generationKwh / maxGen) * 100}%` }}
-                    transition={{ delay: i * 0.05, type: "spring", stiffness: 60 }}
-                    className="w-full bg-gradient-to-t from-amber-600 to-amber-500 rounded-t-md group-hover:brightness-110 transition-all"
-                  />
-               </div>
-               <span className="text-[9px] font-black uppercase text-foreground/40 mt-1">{m.month}</span>
-             </div>
-           ))}
+             );
+           })}
         </div>
       </div>
 
@@ -295,14 +298,14 @@ export function SolarWizardResult({
       <div className="space-y-3 pt-2">
         <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40 px-1">Detailed Cost Breakdown</p>
         <div className="bg-secondary/5 border border-border/40 rounded-3xl overflow-hidden shadow-inner">
-          <div className="overflow-x-auto custom-scrollbar">
-            <table className="w-full text-left border-collapse min-w-[500px]">
+          <div className="overflow-x-auto scrollbar-hide">
+            <table className="w-full text-left border-collapse min-w-[320px]">
               <thead>
                 <tr className="border-b border-border/40 text-[10px] font-black uppercase tracking-widest text-foreground/40 bg-background/50">
-                  <th className="p-5 rounded-tl-3xl">Component</th>
-                  <th className="p-5 text-center">Qty</th>
-                  <th className="p-5 text-right hidden sm:table-cell">Unit Price</th>
-                  <th className="p-5 text-right rounded-tr-3xl">Total</th>
+                  <th className="p-4 px-5 rounded-tl-3xl">Component</th>
+                  <th className="p-4 text-center">Qty</th>
+                  <th className="p-4 text-right hidden sm:table-cell">Unit</th>
+                  <th className="p-4 text-right rounded-tr-3xl">Total</th>
                 </tr>
               </thead>
               <tbody className="text-sm">
@@ -347,22 +350,50 @@ export function SolarWizardResult({
         </div>
       </div>
 
-      {/* Final Summary Card */}
-      <div className="bg-foreground text-background rounded-3xl p-8 relative overflow-hidden">
+      {/* Final Summary Card & Quick Intake */}
+      <div className="bg-foreground text-background rounded-3xl p-8 relative overflow-hidden group">
+        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
         <CalendarDays className="absolute -bottom-10 -right-10 w-48 h-48 text-background/5 -rotate-12"/>
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div className="space-y-2 max-w-full">
-            <h4 className="text-xl sm:text-2xl font-black font-heading leading-tight">LIFETIME BENEFIT</h4>
-            <p className="text-3xl sm:text-4xl lg:text-5xl font-black font-heading text-primary break-words">{fmtUsd(lifetimeSavings25Yr)}</p>
-            <p className="text-xs sm:text-sm font-bold opacity-40">Net Profit over 25 years (inflation adjusted)</p>
+        
+        <div className="relative z-10 space-y-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="space-y-1">
+              <h4 className="text-sm font-black uppercase tracking-[0.3em] opacity-40">Guaranteed Return</h4>
+              <p className="text-4xl sm:text-6xl font-black font-heading text-primary leading-none">{fmtUsd(lifetimeSavings25Yr)}</p>
+              <p className="text-[10px] font-bold opacity-30 mt-2 uppercase tracking-widest">Calculated net profit over 25 years (Inflation adjusted)</p>
+            </div>
+            
+            <div className="flex flex-col gap-2 w-full md:w-auto">
+              <button onClick={shareWA} className="bg-primary text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-primary/20">
+                Send to WhatsApp <MessageCircle className="w-4 h-4"/>
+              </button>
+              <button onClick={copyText} className="bg-white/5 border border-white/10 text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 hover:bg-white/10 transition-all">
+                {copied ? "Copied!" : "Copy Details"} <Copy className="w-4 h-4"/>
+              </button>
+            </div>
           </div>
-          <div className="flex flex-col gap-3">
-            <button onClick={shareWA} className="w-full bg-primary text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:scale-[1.02] transition-transform">
-              Send Design to WhatsApp <MessageCircle className="w-4 h-4"/>
-            </button>
-            <button onClick={copyText} className="w-full border border-background/20 py-4 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-background/10 transition-colors">
-              {copied ? "Design Copied!" : "Copy Full Design Details"} <Copy className="w-4 h-4"/>
-            </button>
+
+          <div className="pt-8 border-t border-white/10">
+            <div className="bg-white/5 rounded-[2rem] p-6 border border-white/5">
+               <h5 className="text-xl font-black font-heading mb-4">Would you like to install this system?</h5>
+               <p className="text-sm opacity-50 mb-6">Our technical team will review your local grid conditions and send you a fully itemized official project proposal.</p>
+               
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2">Your Name</label>
+                    <input type="text" placeholder="Designate project owner..." 
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary transition-all text-white"/>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2">WhatsApp Number</label>
+                    <input type="tel" placeholder="+ (Country Code) ..." 
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary transition-all text-white"/>
+                  </div>
+                  <button className="md:col-span-2 bg-white text-foreground py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all shadow-2xl">
+                    Submit Project for Engineering Review
+                  </button>
+               </div>
+            </div>
           </div>
         </div>
       </div>

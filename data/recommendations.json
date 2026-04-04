@@ -88,5 +88,107 @@
       "roofOverridden": false,
       "instantPeakKw": 5
     }
+  },
+  {
+    "id": "AA-1775293606938-271",
+    "timestamp": "2026-04-04T09:06:46.938Z",
+    "contact": {
+      "name": "",
+      "phone": "",
+      "email": ""
+    },
+    "location": {
+      "city": "",
+      "country": "LK"
+    },
+    "answers": {
+      "isCommercial": false,
+      "isThreePhase": false,
+      "monthlyUsageKwh": 250,
+      "needsBackup": false,
+      "backupHours": 8,
+      "goalMaxIncome": false,
+      "offGrid": false,
+      "needsEV": false,
+      "evChargingKw": 7,
+      "evKmPerDay": 40,
+      "name": "",
+      "phone": "",
+      "email": "",
+      "city": "",
+      "countryCode": "LK",
+      "roofAreaM2": null,
+      "roofOverridden": false,
+      "instantPeakKw": 2,
+      "usageMode": "units"
+    }
+  },
+  {
+    "id": "AA-1775293614923-133",
+    "timestamp": "2026-04-04T09:06:54.923Z",
+    "contact": {
+      "name": "",
+      "phone": "",
+      "email": ""
+    },
+    "location": {
+      "city": "Colombo",
+      "country": "LK"
+    },
+    "answers": {
+      "isCommercial": false,
+      "isThreePhase": false,
+      "monthlyUsageKwh": 500,
+      "needsBackup": false,
+      "backupHours": 8,
+      "goalMaxIncome": false,
+      "offGrid": false,
+      "needsEV": true,
+      "evChargingKw": 7,
+      "evKmPerDay": 50,
+      "name": "",
+      "phone": "",
+      "email": "",
+      "city": "Colombo",
+      "countryCode": "LK",
+      "roofAreaM2": null,
+      "roofOverridden": false,
+      "instantPeakKw": 2,
+      "usageMode": "bill"
+    }
+  },
+  {
+    "id": "AA-1775293911499-210",
+    "timestamp": "2026-04-04T09:11:51.499Z",
+    "contact": {
+      "name": "33",
+      "phone": "22",
+      "email": "22"
+    },
+    "location": {
+      "city": "Colombo",
+      "country": "LK"
+    },
+    "answers": {
+      "isCommercial": false,
+      "isThreePhase": false,
+      "monthlyUsageKwh": 574,
+      "needsBackup": true,
+      "backupHours": 24,
+      "goalMaxIncome": false,
+      "offGrid": false,
+      "needsEV": true,
+      "evChargingKw": 7,
+      "evKmPerDay": 40,
+      "name": "33",
+      "phone": "22",
+      "email": "22",
+      "city": "Colombo",
+      "countryCode": "LK",
+      "roofAreaM2": 21,
+      "roofOverridden": false,
+      "instantPeakKw": 4,
+      "usageMode": "units"
+    }
   }
 ]

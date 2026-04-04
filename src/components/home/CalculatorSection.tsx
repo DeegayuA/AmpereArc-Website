@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { formatPrice, convertPrice } from "@/lib/currency";
+import { RecommendationModal } from "./RecommendationModal";
 
 export function CalculatorSection() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -14,13 +15,24 @@ export function CalculatorSection() {
   // Calculator State (Base values in GBP)
   const [monthlyBillGBP, setMonthlyBillGBP] = useState(150);
   const [hasSolar, setHasSolar] = useState(false);
+  const [hasEV, setHasEV] = useState(false);
+  const [evKmPerDay, setEvKmPerDay] = useState(40);
+  const [idShowModal, setIsShowModal] = useState(false);
 
   // --- Advanced Logic ---
   const annualBill = monthlyBillGBP * 12;
   const savingsFactor = hasSolar ? 0.85 : 0.65; // Optimized for BESS efficacy
-  const annualSavings = annualBill * savingsFactor;
-  const fiveYearSavings = annualSavings * 5.25; // Factoring in grid inflation (approx 5%)
-  const co2SavedPerYear = (annualBill / 0.15) * 0.4; // Extrapolated from kWh/£ logic (~400g per kWh)
+  
+  // EV Fuel Savings Calculation (UK Base: 10km/L ICE vs 6km/kWh EV)
+  // Distance / ICE_Eff * Fuel_Price - Distance / EV_Eff * Energy_Price
+  const annualKm = evKmPerDay * 365;
+  const iceFuelCost = (annualKm / 10) * 1.80; // £1.80/L
+  const evEnergyCost = (annualKm / 6) * 0.30; // £0.30/kWh
+  const evFuelSavings = hasEV ? (iceFuelCost - evEnergyCost) : 0;
+
+  const annualSavings = (annualBill * savingsFactor) + evFuelSavings;
+  const fiveYearSavings = annualSavings * 5.25; // Factoring grid inflation
+  const co2SavedPerYear = ((annualBill / 0.15) * 0.4) + (hasEV ? (annualKm * 0.12) : 0); // CO2: 400g/kWh, 120g/km ICE
   const treesEquivalent = Math.floor(co2SavedPerYear / 20); // 20kg per tree/year
 
   // --- Canvas Animation ---
@@ -186,7 +198,7 @@ export function CalculatorSection() {
                 />
                 <input
                   type="range"
-                  min="50" max="1000" step="5"
+                  min="5" max="1000" step="5"
                   value={monthlyBillGBP}
                   onChange={(e) => setMonthlyBillGBP(Number(e.target.value))}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer appearance-none z-20"
@@ -194,32 +206,54 @@ export function CalculatorSection() {
                 />
               </div>
               <div className="flex justify-between text-[10px] text-background/30 font-bold">
-                <span>{formatPrice(convertPrice(50, currency), currency)}</span>
+                <span>{formatPrice(convertPrice(5, currency), currency)}</span>
                 <span>{formatPrice(convertPrice(1000, currency), currency)}</span>
               </div>
             </div>
 
-            {/* Checkbox */}
-            <label className="relative flex items-center p-4 bg-white/5 border border-white/5 rounded-2xl cursor-pointer group hover:bg-white/10 transition-all active:scale-[0.98]">
-              <input
-                type="checkbox"
-                checked={hasSolar}
-                onChange={(e) => setHasSolar(e.target.checked)}
-                className="w-6 h-6 accent-primary rounded-lg border-2 border-primary/50 transition-colors mr-4"
-              />
-              <div className="flex-1">
-                <div className="text-sm font-bold text-background leading-none mb-1">I have solar panels already</div>
-                <div className="text-[11px] text-background/40">use existing solar panel generation in estimate</div>
-              </div>
-              {hasSolar && (
-                <motion.span 
-                  initial={{ scale: 0 }} animate={{ scale: 1 }}
-                  className="bg-primary/20 text-primary text-[10px] font-black px-2 py-1 rounded-md"
-                >
-                  ACTIVE
-                </motion.span>
-              )}
-            </label>
+            {/* Checkboxes */}
+            <div className="grid grid-cols-1 gap-2">
+              <label className="relative flex items-center p-4 bg-white/5 border border-white/5 rounded-2xl cursor-pointer group hover:bg-white/10 transition-all active:scale-[0.98]">
+                <input
+                  type="checkbox"
+                  checked={hasSolar}
+                  onChange={(e) => setHasSolar(e.target.checked)}
+                  className="w-6 h-6 accent-primary rounded-lg border-2 border-primary/50 transition-colors mr-4"
+                />
+                <div className="flex-1">
+                  <div className="text-sm font-bold text-background leading-none mb-1">I have solar panels</div>
+                  <div className="text-[11px] text-background/40">Include existing generation</div>
+                </div>
+              </label>
+
+              <label className="relative flex flex-col p-4 bg-white/5 border border-white/5 rounded-2xl cursor-pointer group hover:bg-white/10 transition-all active:scale-[0.98]">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={hasEV}
+                    onChange={(e) => setHasEV(e.target.checked)}
+                    className="w-6 h-6 accent-primary rounded-lg border-2 border-primary/50 transition-colors mr-4"
+                  />
+                  <div className="flex-1">
+                    <div className="text-sm font-bold text-background leading-none mb-1">I have an EV</div>
+                    <div className="text-[11px] text-background/40">Calculate fuel savings</div>
+                  </div>
+                </div>
+                {hasEV && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} className="mt-4 pt-4 border-t border-white/5 space-y-2">
+                    <div className="flex justify-between text-[10px] font-black uppercase text-primary">
+                      <span>Daily Distance</span>
+                      <span>{evKmPerDay} km</span>
+                    </div>
+                    <input 
+                      type="range" min={5} max={200} step={5} value={evKmPerDay}
+                      onChange={e=>setEvKmPerDay(Number(e.target.value))}
+                      className="w-full accent-primary h-1 bg-white/10 rounded-full"
+                    />
+                  </motion.div>
+                )}
+              </label>
+            </div>
 
             {/* Results Grid */}
             <div className="grid grid-cols-2 gap-3 pt-2">
@@ -251,20 +285,37 @@ export function CalculatorSection() {
               </div>
             </div>
 
-            <button 
-              onClick={() => window.location.href = '/contact'}
-              className="relative w-full py-4 rounded-full overflow-hidden group"
-            >
-               <div className="absolute inset-0 bg-background transition-transform duration-500 group-hover:scale-[1.02]" />
-               <div className="absolute inset-x-0 bottom-0 h-1 bg-primary/30" />
-               <span className="relative z-10 font-black text-xs uppercase tracking-[0.3em] text-foreground">
-                 Get a Quote
-               </span>
-            </button>
+            <div className="flex flex-col gap-2 pt-2">
+              <button 
+                onClick={() => setIsShowModal(true)}
+                className="relative w-full py-5 rounded-[1.5rem] overflow-hidden group bg-primary"
+              >
+                 <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                 <span className="relative z-10 font-black text-xs uppercase tracking-[0.3em] text-white">
+                   Recommend My System
+                 </span>
+              </button>
+              
+              <button 
+                onClick={() => window.location.href = '/contact'}
+                className="relative w-full py-4 rounded-full overflow-hidden group border border-white/10 hover:border-primary/50 transition-colors"
+              >
+                 <span className="relative z-10 font-black text-[10px] uppercase tracking-[0.3em] text-background/40 group-hover:text-primary transition-colors">
+                   Speak to an Engineer
+                 </span>
+              </button>
+            </div>
           </div>
         </motion.div>
 
       </div>
+      
+      <RecommendationModal 
+        isOpen={idShowModal} 
+        onClose={() => setIsShowModal(false)}
+        quickUsageKwh={Math.round(monthlyBillGBP / 0.30)}
+        quickEvKm={hasEV ? evKmPerDay : 0}
+      />
     </section>
   );
 }
