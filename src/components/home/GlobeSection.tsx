@@ -15,23 +15,35 @@ export function GlobeSection() {
   return (
     <section className="py-16 px-6 md:px-12 bg-background relative overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-10">
+        <div className="text-center max-w-4xl mx-auto mb-16">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] md:text-sm font-black uppercase tracking-[0.2em] mb-8"
+          >
+            Product of UK 🇬🇧 <span className="opacity-40">|</span> Engineered for the World
+          </motion.div>
+          
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold font-heading mb-4"
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-6xl lg:text-7xl font-black font-heading tracking-tight mb-8 leading-[0.9] text-foreground"
           >
-            Trusted Worldwide
+            Global Vision <br />
+            <span className="text-primary italic">Local Engineering</span>
           </motion.h2>
+          
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-lg text-foreground/80 font-sans"
+            transition={{ delay: 0.2 }}
+            className="text-lg md:text-xl text-foreground/70 font-sans max-w-2xl mx-auto leading-relaxed"
           >
-            With thousands of installations across multiple continents, AmpereArc is shaping the future of energy storage.
+            From our design studio in the UK, AmpereArc is setting a new global standard for intelligent, high-performance energy storage solutions.
           </motion.p>
         </div>
 
