@@ -331,7 +331,7 @@ function BentoCard({ item, index, isMobile, onClick }: { item: typeof products[0
         isMobile ? 'p-3' : (!isLarge ? 'p-3' : 'p-5')
       } group-hover:p-4`}>
         {/* Info Module */}
-        <div className={`relative overflow-hidden bg-white/40 dark:bg-black/40 backdrop-blur-3xl rounded-2xl md:rounded-[2.5rem] border border-white/30 dark:border-white/10 group-hover:border-primary/50 transition-all duration-700 shadow-2xl ${
+        <div className={`relative overflow-hidden bg-white/40 dark:bg-black/40 backdrop-blur-3xl rounded-2xl md:rounded-[1.75rem] border border-white/30 dark:border-white/10 group-hover:border-primary/50 transition-all duration-700 shadow-2xl ${
           siteConfig.hideAllPrices ? (isMobile ? 'p-4 md:p-5' : (!isLarge ? 'p-3' : 'p-5 md:p-6')) : (isMobile ? 'p-6' : (!isLarge ? 'p-3 md:p-4' : 'p-6 md:p-8'))
         }`}>
           {siteConfig.hideAllPrices ? (
