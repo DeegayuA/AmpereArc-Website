@@ -7,6 +7,17 @@ import { CalculatorSection } from "@/components/home/CalculatorSection";
 export const metadata = {
   title: "AmpereArc | Home",
   description: "Next-generation energy storage and management solutions.",
+  openGraph: {
+    title: "AmpereArc | Home",
+    description: "Next-generation energy storage and management solutions.",
+    images: ["/assets/Logos/AmpereArc-Symbol-CLR.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AmpereArc | Home",
+    description: "Next-generation energy storage and management solutions.",
+    images: ["/assets/Logos/AmpereArc-Symbol-CLR.png"],
+  },
 };
 
 export default function Home() {

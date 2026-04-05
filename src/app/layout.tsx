@@ -27,6 +27,28 @@ export const viewport = {
 export const metadata: Metadata = {
   title: "AmpereArc Energy Storage Systems",
   description: "Smarter, Greener Energy Storage for a Sustainable Future - Leading the way in battery storage technology.",
+  openGraph: {
+    title: "AmpereArc Energy Storage Systems",
+    description: "Smarter, Greener Energy Storage for a Sustainable Future",
+    url: "https://amperearc.com",
+    siteName: "AmpereArc",
+    images: [
+      {
+        url: "/assets/Logos/AmpereArc-Symbol-CLR.png",
+        width: 1200,
+        height: 630,
+        alt: "AmpereArc Logo",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AmpereArc Energy Storage Systems",
+    description: "Leading the way in battery storage technology.",
+    images: ["/assets/Logos/AmpereArc-Symbol-CLR.png"],
+  },
 };
 
 export default function RootLayout({
