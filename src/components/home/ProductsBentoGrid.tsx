@@ -284,7 +284,6 @@ export function ProductsBentoGrid() {
 }
 
 function BentoCard({ item, index, isMobile, onClick }: { item: typeof products[0] & { spans: string }, index: number, isMobile: boolean, onClick: () => void }) {
-  const [isLoaded, setIsLoaded] = useState(false);
   const { currency, t } = useSettings();
 
   const discountedPrice = item.basePrice * (1 - item.discountPercentage / 100);
@@ -311,8 +310,7 @@ function BentoCard({ item, index, isMobile, onClick }: { item: typeof products[0
           src={item.img}
           alt={item.title}
           fill
-          onLoad={() => setIsLoaded(true)}
-          className={`object-cover transition-all duration-1000 ease-out group-hover:scale-110 ${isLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-lg'}`}
+          className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-[1]" />
       </div>

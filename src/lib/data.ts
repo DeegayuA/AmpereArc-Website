@@ -94,6 +94,7 @@ export const products: Product[] = [
     img: "/assets/Products/10kW_Hybrid_Inveter_3Phase.png",
     className: "md:col-span-2 md:row-span-2",
     tags: ["high-power", "three-phase", "commercial", "efficiency"],
+    visible: false,
     metadata: { kw: 30, phases: 3 }
   },
 
@@ -122,6 +123,7 @@ export const products: Product[] = [
     img: "/assets/Products/16.8kW_Battery.png",
     className: "md:col-span-2 md:row-span-1",
     tags: ["large-capacity", "autonomy", "backup"],
+    visible: false,
     metadata: { kwh: 16.8, dod: 0.8 }
   },
   {
@@ -206,13 +208,14 @@ export const products: Product[] = [
     img: "/assets/Products/AI-EV_Charger_7kw-22kw.png",
     className: "md:col-span-1 md:row-span-1",
     tags: ["ev", "three-phase", "fast-charge"],
+    visible: false,
     metadata: { chargingKw: 11, phases: 3, minHomePhasesRequired: 3 }
   },
   {
     id: "ev-40kw",
     title: "AmpereArc 40kW DC EV Charger",
     desc: "High-speed DC fast charging station with OCPP 1.6J support. Requires three-phase supply. Charges most EVs in under 2 hour.",
-    category: "Home",
+    category: "Commercial",
     subCategory: "EV Chargers",
     basePrice: 12000,
     discountPercentage: 10,
@@ -223,8 +226,8 @@ export const products: Product[] = [
   },
   {
     id: "c-ev-22kw-3ph",
-    title: "AmpereArc 22kW Commercial EV Charger",
-    desc: "Three-phase commercial EV charging station for car parks, business premises and fleet operations. OCPP compliant.",
+    title: "AmpereArc 22kW OCPP EV Charger",
+    desc: "Three-phase OCPP EV charging station for car parks, business premises and fleet operations. OCPP compliant.",
     category: "Commercial",
     subCategory: "EV Chargers",
     basePrice: 640,
