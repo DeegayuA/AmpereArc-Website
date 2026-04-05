@@ -8,7 +8,7 @@ import {
   X, ArrowLeft, Home, Building2, Zap, Battery, Shield,
   TrendingUp, Car, MapPin, ChevronRight, Loader2, Globe, Sun, User, Phone, Mail, CheckCircle2, ChevronUp, ShoppingCart
 } from "lucide-react";
-import { products } from "@/lib/data";
+import { products, siteConfig } from "@/lib/data";
 import { calculateSystem, getAvailableCountries, getTariff, SystemDesign, SystemInputs } from "@/lib/solar-engine";
 import { currencies } from "@/lib/currency";
 import { useSettings } from "@/components/providers/SettingsProvider";
@@ -493,7 +493,7 @@ export function RecommendationModal({ isOpen, onClose, quickUsageKwh, quickEvKm 
                                           <div className="flex-1 min-w-0">
                                             <p className={`text-xs font-black font-heading truncate ${selected ? "text-primary" : ""}`}>{p.title}</p>
                                             <p className="text-[10px] font-bold text-foreground/40">{p.metadata.kwh}kWh LFP</p>
-                                            <p className="text-[11px] font-black mt-1">{fmtUsd(p.basePrice * (1 - p.discountPercentage/100))}</p>
+                                            {!siteConfig.hideAllPrices && <p className="text-[11px] font-black mt-1">{fmtUsd(p.basePrice * (1 - p.discountPercentage/100))}</p>}
                                           </div>
                                           {selected && <CheckCircle2 className="w-5 h-5 text-primary shrink-0"/>}
                                         </button>
@@ -701,9 +701,13 @@ export function RecommendationModal({ isOpen, onClose, quickUsageKwh, quickEvKm 
                           <ShoppingCart className="w-5 h-5"/>
                         </div>
                         <div className="text-left">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40 leading-none mb-1">Your Estimate</p>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40 leading-none mb-1">{!siteConfig.hideAllPrices ? 'Your Estimate' : 'System Summary'}</p>
                           <div className="flex items-center gap-2">
-                             <span className="font-black font-heading text-lg leading-none">{fmtUsd(liveDesign.costBreakdown.discountedTotal)}</span>
+                             {!siteConfig.hideAllPrices ? (
+                               <span className="font-black font-heading text-lg leading-none">{fmtUsd(liveDesign.costBreakdown.discountedTotal)}</span>
+                             ) : (
+                               <span className="font-black font-heading text-sm text-foreground/80 leading-none">View Specs</span>
+                             )}
                              <ChevronUp className={`w-4 h-4 transition-transform duration-300 ${showLiveSummary ? 'rotate-180' : ''}`}/>
                           </div>
                         </div>

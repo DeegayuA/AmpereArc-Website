@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { SystemDesign, MONTHS_SHORT } from "@/lib/solar-engine";
+import { siteConfig } from "@/lib/data";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
@@ -61,12 +62,13 @@ export function SolarWizardResult({
       `⚡ Inverter: ${inverters.count}x ${inverters.product.title}`,
       batteries ? `🔋 Battery: ${batteries.count}x ${batteries.product.title}` : "",
       evCharger ? `🚗 EV Charger: ${evCharger.product.title}` : "",
+      evCharger ? `🚗 EV Charger: ${evCharger.product.title}` : "",
       ``,
-      `💰 Total Investment: ${fmtUsd(costBreakdown.discountedTotal)}`,
-      `📉 Monthly Bill Saving: ${fmtUsd(monthlySavingsUsd)}`,
-      evFuelSavingsUsd > 0 ? `⛽ EV Fuel Saving: ${fmtUsd(evFuelSavingsUsd/12)}/mo` : "",
-      `⏱️ Break-even: ${breakEvenYears} years`,
-      `🏆 25-Year Benefit: ${fmtUsd(lifetimeSavings25Yr)}`,
+      !siteConfig.hideAllPrices ? `💰 Total Investment: ${fmtUsd(costBreakdown.discountedTotal)}` : "",
+      !siteConfig.hideAllPrices ? `📉 Monthly Bill Saving: ${fmtUsd(monthlySavingsUsd)}` : "",
+      !siteConfig.hideAllPrices && evFuelSavingsUsd > 0 ? `⛽ EV Fuel Saving: ${fmtUsd(evFuelSavingsUsd/12)}/mo` : "",
+      !siteConfig.hideAllPrices ? `⏱️ Break-even: ${breakEvenYears} years` : "",
+      !siteConfig.hideAllPrices ? `🏆 25-Year Benefit: ${fmtUsd(lifetimeSavings25Yr)}` : "",
       ``,
       `Please contact me for installation.`
     ].filter(Boolean).join("\n");
@@ -297,57 +299,69 @@ export function SolarWizardResult({
       <div className="space-y-3 pt-2">
         <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40 px-1">Detailed Cost Breakdown</p>
         <div className="bg-secondary/5 border border-border/40 rounded-3xl overflow-hidden shadow-inner">
-          <div className="overflow-x-auto scrollbar-hide">
-            <table className="w-full text-left border-collapse min-w-[320px]">
-              <thead>
-                <tr className="border-b border-border/40 text-[10px] font-black uppercase tracking-widest text-foreground/40 bg-background/50">
-                  <th className="p-4 px-5 rounded-tl-3xl">Component</th>
-                  <th className="p-4 text-center">Qty</th>
-                  <th className="p-4 text-right hidden sm:table-cell">Unit</th>
-                  <th className="p-4 text-right rounded-tr-3xl">Total</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm">
-                {[
-                  { l: "Solar Panels - " + panels.product.title, c: panels.count, u: panels.discountedUnitPriceUsd, t: panels.discountedTotalUsd },
-                  { l: "Inverter - " + inverters.product.title, c: inverters.count, u: inverters.discountedUnitPriceUsd, t: inverters.discountedTotalUsd },
-                  batteries && { l: "Energy Storage - " + batteries.product.title, c: batteries.count, u: batteries.discountedUnitPriceUsd, t: batteries.discountedTotalUsd },
-                  evCharger && { l: "EV Charger - " + evCharger.product.title, c: evCharger.count, u: evCharger.discountedUnitPriceUsd, t: evCharger.discountedTotalUsd },
-                ].filter(Boolean).map((item: any, i) => (
-                  <tr key={i} className="border-b border-border/20 last:border-0 hover:bg-background/40 transition-colors">
-                    <td className="p-4 px-5 font-bold text-foreground sm:max-w-none max-w-[150px] truncate" title={item.l}>{item.l}</td>
-                    <td className="p-4 px-5 text-center text-foreground/60 font-medium">x{item.c}</td>
-                    <td className="p-4 px-5 text-right text-foreground/60 hidden sm:table-cell">{fmtUsd(item.u)}</td>
-                    <td className="p-4 px-5 text-right font-black">{fmtUsd(item.t)}</td>
+            <div className="overflow-x-auto scrollbar-hide">
+              <table className="w-full text-left border-collapse min-w-[320px]">
+                <thead>
+                  <tr className="border-b border-border/40 text-[10px] font-black uppercase tracking-widest text-foreground/40 bg-background/50">
+                    <th className="p-4 px-5 rounded-tl-3xl">Component</th>
+                    <th className={`p-4 text-center ${siteConfig.hideAllPrices ? 'rounded-tr-3xl' : ''}`}>Qty</th>
+                    {!siteConfig.hideAllPrices && (
+                      <>
+                        <th className="p-4 text-right hidden sm:table-cell">Unit</th>
+                        <th className="p-4 text-right rounded-tr-3xl">Total</th>
+                      </>
+                    )}
                   </tr>
-                ))}
-                
-                {/* Installation & BOS */}
-                <tr className="border-t border-border/30 bg-background/30">
-                  <td colSpan={2} className="p-3 px-5 sm:hidden"></td>
-                  <td colSpan={3} className="p-3 px-5 text-right text-[10px] font-bold text-foreground/40 uppercase tracking-widest hidden sm:table-cell">Installation & Certification</td>
-                  <td className="p-3 px-5 sm:hidden text-right text-[10px] font-bold text-foreground/40 uppercase tracking-widest">Install</td>
-                  <td className="p-3 px-5 text-right font-black">{fmtUsd(costBreakdown.installation)}</td>
-                </tr>
-                <tr className="bg-background/30">
-                  <td colSpan={2} className="p-3 px-5 sm:hidden"></td>
-                  <td colSpan={3} className="p-3 px-5 text-right text-[10px] font-bold text-foreground/40 uppercase tracking-widest hidden sm:table-cell">Balance of Systems (Wiring/Mounts/Accessories)</td>
-                  <td className="p-3 px-5 sm:hidden text-right text-[10px] font-bold text-foreground/40 uppercase tracking-widest">B.O.S.</td>
-                  <td className="p-3 px-5 text-right font-black">{fmtUsd(costBreakdown.bos)}</td>
-                </tr>
+                </thead>
+                <tbody className="text-sm">
+                  {[
+                    { l: "Solar Panels - " + panels.product.title, c: panels.count, u: panels.discountedUnitPriceUsd, t: panels.discountedTotalUsd },
+                    { l: "Inverter - " + inverters.product.title, c: inverters.count, u: inverters.discountedUnitPriceUsd, t: inverters.discountedTotalUsd },
+                    batteries && { l: "Energy Storage - " + batteries.product.title, c: batteries.count, u: batteries.discountedUnitPriceUsd, t: batteries.discountedTotalUsd },
+                    evCharger && { l: "EV Charger - " + evCharger.product.title, c: evCharger.count, u: evCharger.discountedUnitPriceUsd, t: evCharger.discountedTotalUsd },
+                  ].filter(Boolean).map((item: any, i) => (
+                    <tr key={i} className="border-b border-border/20 last:border-0 hover:bg-background/40 transition-colors">
+                      <td className="p-4 px-5 font-bold text-foreground sm:max-w-none max-w-[150px] truncate" title={item.l}>{item.l}</td>
+                      <td className="p-4 px-5 text-center text-foreground/60 font-medium">x{item.c}</td>
+                      {!siteConfig.hideAllPrices && (
+                        <>
+                          <td className="p-4 px-5 text-right text-foreground/60 hidden sm:table-cell">{fmtUsd(item.u)}</td>
+                          <td className="p-4 px-5 text-right font-black">{fmtUsd(item.t)}</td>
+                        </>
+                      )}
+                    </tr>
+                  ))}
+                  
+                  {/* Installation & BOS */}
+                  {!siteConfig.hideAllPrices && (
+                    <>
+                      <tr className="border-t border-border/30 bg-background/30">
+                        <td colSpan={2} className="p-3 px-5 sm:hidden"></td>
+                        <td colSpan={3} className="p-3 px-5 text-right text-[10px] font-bold text-foreground/40 uppercase tracking-widest hidden sm:table-cell">Installation & Certification</td>
+                        <td className="p-3 px-5 sm:hidden text-right text-[10px] font-bold text-foreground/40 uppercase tracking-widest">Install</td>
+                        <td className="p-3 px-5 text-right font-black">{fmtUsd(costBreakdown.installation)}</td>
+                      </tr>
+                      <tr className="bg-background/30">
+                        <td colSpan={2} className="p-3 px-5 sm:hidden"></td>
+                        <td colSpan={3} className="p-3 px-5 text-right text-[10px] font-bold text-foreground/40 uppercase tracking-widest hidden sm:table-cell">Balance of Systems (Wiring/Mounts/Accessories)</td>
+                        <td className="p-3 px-5 sm:hidden text-right text-[10px] font-bold text-foreground/40 uppercase tracking-widest">B.O.S.</td>
+                        <td className="p-3 px-5 text-right font-black">{fmtUsd(costBreakdown.bos)}</td>
+                      </tr>
 
-                {/* Final Total */}
-                <tr className="bg-primary/5 text-primary border-t-2 border-primary/20">
-                  <td colSpan={2} className="p-5 sm:hidden"></td>
-                  <td colSpan={3} className="p-5 text-right font-black text-xs uppercase tracking-widest hidden sm:table-cell">Net Investment Amount</td>
-                  <td className="p-5 sm:hidden text-right font-black text-xs uppercase tracking-widest">Total</td>
-                  <td className="p-5 text-right font-black text-xl">{fmtUsd(costBreakdown.discountedTotal)}</td>
-                </tr>
-              </tbody>
-            </table>
+                      {/* Final Total */}
+                      <tr className="bg-primary/5 text-primary border-t-2 border-primary/20">
+                        <td colSpan={2} className="p-5 sm:hidden"></td>
+                        <td colSpan={3} className="p-5 text-right font-black text-xs uppercase tracking-widest hidden sm:table-cell">Net Investment Amount</td>
+                        <td className="p-5 sm:hidden text-right font-black text-xs uppercase tracking-widest">Total</td>
+                        <td className="p-5 text-right font-black text-xl">{fmtUsd(costBreakdown.discountedTotal)}</td>
+                      </tr>
+                    </>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
 
       {/* Final Summary Card & Quick Intake */}
       <div className="bg-foreground text-background rounded-3xl p-8 relative overflow-hidden group">
@@ -459,20 +473,22 @@ export function SolarWizardResult({
                   <p className="text-lg font-black">{systemKwp} kWp Yielding</p>
                </div>
             </div>
-            <div className="bg-white border-4 border-black rounded-3xl p-8 flex flex-col justify-center">
-               <h4 className="text-[11px] font-black uppercase tracking-widest text-black mb-4 text-center">Net Final Investment</h4>
-               <p className="text-5xl font-black font-heading text-center text-black">{fmtUsd(costBreakdown.discountedTotal)}</p>
-               <div className="mt-6 grid grid-cols-2 gap-4 border-t-2 border-black/10 pt-6">
-                  <div className="text-center font-black">
-                     <p className="text-[9px] opacity-40 uppercase tracking-tighter">ROI Period</p>
-                     <p className="text-base">{breakEvenYears} Years</p>
-                  </div>
-                  <div className="text-center font-black">
-                     <p className="text-[9px] opacity-40 uppercase tracking-tighter">Life Profit</p>
-                     <p className="text-base">{fmtUsd(lifetimeSavings25Yr)}</p>
-                  </div>
-               </div>
-            </div>
+            {!siteConfig.hideAllPrices && (
+              <div className="bg-white border-4 border-black rounded-3xl p-8 flex flex-col justify-center">
+                 <h4 className="text-[11px] font-black uppercase tracking-widest text-black mb-4 text-center">Net Final Investment</h4>
+                 <p className="text-5xl font-black font-heading text-center text-black">{fmtUsd(costBreakdown.discountedTotal)}</p>
+                 <div className="mt-6 grid grid-cols-2 gap-4 border-t-2 border-black/10 pt-6">
+                    <div className="text-center font-black">
+                       <p className="text-[9px] opacity-40 uppercase tracking-tighter">ROI Period</p>
+                       <p className="text-base">{breakEvenYears} Years</p>
+                    </div>
+                    <div className="text-center font-black">
+                       <p className="text-[9px] opacity-40 uppercase tracking-tighter">Life Profit</p>
+                       <p className="text-base">{fmtUsd(lifetimeSavings25Yr)}</p>
+                    </div>
+                 </div>
+              </div>
+            )}
           </div>
 
           <div className="mb-12">
@@ -502,27 +518,31 @@ export function SolarWizardResult({
            <div className="mb-8 page-break-before-always">
               <h3 className="text-xl font-black font-heading mb-6 border-b-2 border-black pb-2 uppercase tracking-widest">Project Bill of Materials</h3>
               <table className="w-full text-left">
-                <thead className="border-b-2 border-black">
-                  <tr>
-                    <th className="py-3 text-[10px] font-black uppercase tracking-widest">Description</th>
-                    <th className="py-3 text-[10px] font-black uppercase tracking-widest text-right">Qty</th>
-                    <th className="py-3 text-[10px] font-black uppercase tracking-widest text-right">Amount</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y-2 divide-black/5 font-bold">
-                   <PrintRow label={panels.product.title} price={fmtUsd(panels.discountedUnitPriceUsd)} qty={panelCount} total={fmtUsd(panels.discountedTotalUsd)}/>
-                   <PrintRow label={inverters.product.title} price={fmtUsd(inverters.discountedUnitPriceUsd)} qty={inverters.count} total={fmtUsd(inverters.discountedTotalUsd)}/>
-                   {batteries && <PrintRow label={batteries.product.title} price={fmtUsd(batteries.discountedUnitPriceUsd)} qty={batteries.count} total={fmtUsd(batteries.discountedTotalUsd)}/>}
-                   {evCharger && <PrintRow label={evCharger.product.title} price={fmtUsd(evCharger.discountedUnitPriceUsd)} qty={evCharger.count} total={fmtUsd(evCharger.discountedTotalUsd)}/>}
-                   <PrintRow label="Professional Installation & Smart Certification" price="N/A" qty="1" total={fmtUsd(costBreakdown.installation)}/>
-                   <PrintRow label="Balance of Systems (Wiring, Racking, Safety Switchgear)" price="N/A" qty="1" total={fmtUsd(costBreakdown.bos)}/>
-                   <tr className="border-t-4 border-black font-black">
-                      <td colSpan={2} className="py-6 text-right uppercase tracking-[0.3em]">Net Proposal Total</td>
-                      <td className="py-6 text-right text-lg">{fmtUsd(costBreakdown.discountedTotal)}</td>
-                   </tr>
-                </tbody>
-              </table>
-           </div>
+                  <thead className="border-b-2 border-black">
+                    <tr>
+                      <th className="py-3 text-[10px] font-black uppercase tracking-widest">Description</th>
+                      <th className="py-3 text-[10px] font-black uppercase tracking-widest text-right">Qty</th>
+                      {!siteConfig.hideAllPrices && <th className="py-3 text-[10px] font-black uppercase tracking-widest text-right">Amount</th>}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y-2 divide-black/5 font-bold">
+                     <PrintRow label={panels.product.title} price={fmtUsd(panels.discountedUnitPriceUsd)} qty={panelCount} total={fmtUsd(panels.discountedTotalUsd)}/>
+                     <PrintRow label={inverters.product.title} price={fmtUsd(inverters.discountedUnitPriceUsd)} qty={inverters.count} total={fmtUsd(inverters.discountedTotalUsd)}/>
+                     {batteries && <PrintRow label={batteries.product.title} price={fmtUsd(batteries.discountedUnitPriceUsd)} qty={batteries.count} total={fmtUsd(batteries.discountedTotalUsd)}/>}
+                     {evCharger && <PrintRow label={evCharger.product.title} price={fmtUsd(evCharger.discountedUnitPriceUsd)} qty={evCharger.count} total={fmtUsd(evCharger.discountedTotalUsd)}/>}
+                     {!siteConfig.hideAllPrices && (
+                       <>
+                         <PrintRow label="Professional Installation & Smart Certification" price="N/A" qty="1" total={fmtUsd(costBreakdown.installation)}/>
+                         <PrintRow label="Balance of Systems (Wiring, Racking, Safety Switchgear)" price="N/A" qty="1" total={fmtUsd(costBreakdown.bos)}/>
+                         <tr className="border-t-4 border-black font-black">
+                            <td colSpan={2} className="py-6 text-right uppercase tracking-[0.3em]">Net Proposal Total</td>
+                            <td className="py-6 text-right text-lg">{fmtUsd(costBreakdown.discountedTotal)}</td>
+                         </tr>
+                       </>
+                     )}
+                  </tbody>
+                </table>
+             </div>
 
            <div className="mt-auto border-t-2 border-black pt-10 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em]">
               <p>© AmpereArc Engineering Design Studio</p>
@@ -563,8 +583,8 @@ function PrintRow({label, price, qty, total}: any) {
   return (
     <tr>
       <td className="py-4 text-xs font-black text-black">{label}</td>
-      <td className="py-4 text-xs text-right text-black font-black whitespace-nowrap">{qty}</td>
-      <td className="py-4 text-xs text-right font-black text-black">{total}</td>
+      <td className={`py-4 text-xs ${siteConfig.hideAllPrices ? 'text-right' : 'text-right'} text-black font-black whitespace-nowrap`}>x{qty}</td>
+      {!siteConfig.hideAllPrices && <td className="py-4 text-xs text-right font-black text-black">{total}</td>}
     </tr>
   );
 }

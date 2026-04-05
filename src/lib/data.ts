@@ -1,3 +1,7 @@
+export const siteConfig = {
+  hideAllPrices: true
+};
+
 export const categories = ["Home", "Commercial"];
 
 export const subCategories = [

@@ -3,8 +3,8 @@
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, Home, Building2, LayoutGrid, Zap, Battery, Car, Sun, ArrowRight } from "lucide-react";
-import { products, categories, subCategories } from "@/lib/data";
+import { ChevronDown, ChevronUp, Home, Building2, LayoutGrid, Zap, Battery, Car, Sun, ArrowRight, X, AlertCircle } from "lucide-react";
+import { products, categories, subCategories, siteConfig, Product } from "@/lib/data";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { convertPrice, formatPrice } from "@/lib/currency";
 
@@ -13,7 +13,8 @@ export function ProductsBentoGrid() {
   const [activeSub, setActiveSub] = useState("BESS (Battery Energy Storage)");
   const [visibleCount, setVisibleCount] = useState(2);
   const [isMobile, setIsMobile] = useState(false);
-  const { t } = useSettings();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { t, currency } = useSettings();
 
   // Reset expansion when navigation changes
   useEffect(() => {
@@ -151,7 +152,7 @@ export function ProductsBentoGrid() {
                 className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 auto-rows-[22rem] md:auto-rows-[18rem] grid-flow-dense"
               >
                 {displayedProducts.map((item, idx) => (
-                  <BentoCard key={`${item.id}-${idx}`} item={item} index={idx} isMobile={isMobile} />
+                  <BentoCard key={`${item.id}-${idx}`} item={item} index={idx} isMobile={isMobile} onClick={() => setSelectedProduct(item)} />
                 ))}
               </motion.div>
             ) : (
@@ -190,11 +191,79 @@ export function ProductsBentoGrid() {
           )}
         </div>
       </div>
+
+      {/* MODAL POPUP */}
+      <AnimatePresence>
+        {selectedProduct && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-12">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
+              onClick={() => setSelectedProduct(null)} 
+            />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-5xl bg-background rounded-3xl md:rounded-[3rem] overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]"
+            >
+              <button onClick={() => setSelectedProduct(null)} className="absolute top-4 right-4 md:top-6 md:right-6 z-50 p-2 bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 rounded-full transition-colors">
+                <X className="w-5 h-5 text-foreground" />
+              </button>
+              
+              {/* Image Section */}
+              <div className="w-full md:w-1/2 bg-zinc-100 dark:bg-zinc-800/50 flex items-center justify-center relative min-h-[250px] md:min-h-[400px]">
+                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.05)_100%)] z-0" />
+                 {!siteConfig.hideAllPrices && selectedProduct.discountPercentage > 0 && (
+                   <div className="absolute top-6 left-6 z-20">
+                      <div className="bg-primary text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20">
+                        -{selectedProduct.discountPercentage}%
+                      </div>
+                   </div>
+                 )}
+                 <Image src={selectedProduct.img} alt={selectedProduct.title} fill className="object-contain p-8 md:p-12 relative z-10 hover:scale-105 transition-transform duration-700" />
+              </div>
+
+              {/* Info Section */}
+              <div className="w-full md:w-1/2 p-6 md:p-10 lg:p-12 flex flex-col overflow-y-auto">
+                <div className="flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] text-[8px] md:text-[10px] mb-3">
+                  <span>{selectedProduct.category}</span>
+                  <div className="h-[2px] w-2 bg-primary/40 rounded-full" />
+                  <span>{selectedProduct.subCategory}</span>
+                </div>
+                
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-black font-heading leading-tight mb-4 text-foreground">{selectedProduct.title}</h2>
+                <p className="text-foreground/70 font-medium text-sm md:text-base leading-relaxed mb-6">{selectedProduct.desc}</p>
+                
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {selectedProduct.tags.map(tag => (
+                    <span key={tag} className="px-3 py-1 bg-secondary/10 border border-border/40 text-foreground/60 rounded-md text-[9px] font-black uppercase tracking-widest">{tag}</span>
+                  ))}
+                </div>
+
+                {!siteConfig.hideAllPrices && (
+                  <div className="mb-8 pb-8 border-b border-border/30">
+                    <span className="font-black uppercase tracking-widest text-foreground/40 leading-none text-[9px] block mb-2">Pricing Estimate</span>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-3xl lg:text-4xl font-black font-heading text-primary">{formatPrice(convertPrice(selectedProduct.basePrice * (1 - selectedProduct.discountPercentage / 100), currency), currency)}</span>
+                      <span className="text-xl font-bold text-foreground/30 line-through decoration-primary/40 decoration-2">{formatPrice(convertPrice(selectedProduct.basePrice, currency), currency)}</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 md:p-6 flex items-start gap-3 mt-auto">
+                   <AlertCircle className="w-6 h-6 text-primary shrink-0" />
+                   <div>
+                     <h4 className="font-black uppercase tracking-widest text-primary text-xs mb-1">Extended Technical Data</h4>
+                     <p className="text-xs font-medium text-foreground/70 leading-relaxed">Full engineering specifications, CAD models, and official datasheets will be available to download soon.</p>
+                   </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
 
-function BentoCard({ item, index, isMobile }: { item: typeof products[0] & { spans: string }, index: number, isMobile: boolean }) {
+function BentoCard({ item, index, isMobile, onClick }: { item: typeof products[0] & { spans: string }, index: number, isMobile: boolean, onClick: () => void }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const { currency, t } = useSettings();
 
@@ -207,14 +276,15 @@ function BentoCard({ item, index, isMobile }: { item: typeof products[0] & { spa
   const isSquare = item.spans.includes("row-span-2");
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: index * 0.04 }}
-      whileHover="hover"
-      className={`relative rounded-xl md:rounded-[2.5rem] overflow-hidden bg-white dark:bg-zinc-900 border border-black/5 dark:border-white/5 shadow-lg group transition-all duration-700 hover:shadow-2xl hover:shadow-primary/10 ${isMobile ? 'col-span-1 row-span-1' : item.spans}`}
-    >
+    <button onClick={onClick} className={isMobile ? 'col-span-1 row-span-1 block w-full text-left' : `${item.spans} block w-full text-left`}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: index * 0.04 }}
+        whileHover="hover"
+        className={`relative w-full h-full rounded-xl md:rounded-[2.5rem] overflow-hidden bg-white dark:bg-zinc-900 border border-black/5 dark:border-white/5 shadow-lg group transition-all duration-700 hover:shadow-2xl hover:shadow-primary/10`}
+      >
       {/* Background Asset */}
       <div className="absolute inset-0 z-0 bg-zinc-100 dark:bg-zinc-800">
         <Image
@@ -222,78 +292,104 @@ function BentoCard({ item, index, isMobile }: { item: typeof products[0] & { spa
           alt={item.title}
           fill
           onLoad={() => setIsLoaded(true)}
-          className={`object-contain transition-all duration-1000 ease-out group-hover:scale-105 group-hover:-translate-y-4 ${
-            isMobile || !isLarge ? 'p-6' : 'p-12'
-          } ${isLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-lg'}`}
+          className={`object-cover transition-all duration-1000 ease-out group-hover:scale-110 ${isLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-lg'}`}
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.05)_100%)] z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-[1]" />
       </div>
 
       {/* Discount Badge */}
-      <div className={`absolute z-20 ${isMobile ? 'top-3 left-3' : 'top-6 left-6'}`}>
-        <div className="bg-primary text-white px-2 py-0.5 md:px-4 md:py-2 rounded-full text-[8px] md:text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20">
-          -{item.discountPercentage}%
+      {!siteConfig.hideAllPrices && (
+        <div className={`absolute z-20 ${isMobile ? 'top-3 left-3' : 'top-6 left-6'}`}>
+          <div className="bg-primary text-white px-2 py-0.5 md:px-4 md:py-2 rounded-full text-[8px] md:text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20">
+            -{item.discountPercentage}%
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Content Engine */}
       <div className={`absolute inset-0 flex flex-col justify-end z-10 transition-all duration-500 ${
-        isMobile ? 'p-5' : (!isLarge ? 'p-3' : 'p-6')
+        isMobile ? 'p-3' : (!isLarge ? 'p-3' : 'p-5')
       } group-hover:p-4`}>
         {/* Info Module */}
         <div className={`relative overflow-hidden bg-white/40 dark:bg-black/40 backdrop-blur-3xl rounded-2xl md:rounded-[2.5rem] border border-white/30 dark:border-white/10 group-hover:border-primary/50 transition-all duration-700 shadow-2xl ${
-          isMobile ? 'p-6' : (!isLarge ? 'p-3 md:p-4' : 'p-6 md:p-8')
+          siteConfig.hideAllPrices ? (isMobile ? 'p-4 md:p-5' : (!isLarge ? 'p-3' : 'p-5 md:p-6')) : (isMobile ? 'p-6' : (!isLarge ? 'p-3 md:p-4' : 'p-6 md:p-8'))
         }`}>
-          <div className="flex flex-col gap-1 md:gap-2">
-            <div className={`flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] ${
-              isMobile ? 'text-[8px]' : (!isLarge ? 'text-[6px]' : 'text-[10px]')
-            }`}>
-              <span>{t.products.hardware}</span>
-              <div className="h-[0.5px] w-3 bg-primary/40" />
-            </div>
-            
-            <motion.h3
-              className={`font-black font-heading text-foreground leading-[1.1] ${
-                isMobile ? 'text-xl' : (!isLarge ? 'text-xs md:text-xl' : 'text-xl md:text-4xl')
-              }`}
-            >
-              {item.title}
-            </motion.h3>
-
-            {isLarge && !isMobile && (
-              <p className="text-foreground/70 text-[10px] md:text-sm line-clamp-1 font-medium mt-1">
-                {item.desc}
-              </p>
-            )}
-
-            <div className="flex items-center justify-between mt-2 md:mt-4">
-              <div className="flex flex-col min-w-0">
-                <span className={`font-black uppercase tracking-widest text-foreground/40 leading-none ${
-                  isMobile ? 'text-[8px]' : (!isLarge ? 'text-[5px]' : 'text-[8px]')
-                }`}>{t.products.price}</span>
-                <div className={`flex gap-1 md:gap-2 ${isLarge && !isMobile ? 'items-baseline flex-row' : 'flex-col items-start'}`}>
-                  <span className={`font-black font-heading text-primary leading-none truncate ${
-                    isMobile ? 'text-3xl' : (!isLarge ? 'text-xs md:text-lg' : 'text-xl md:text-5xl')
-                  }`}>
-                    {formatPrice(currentDiscountedPrice, currency)}
-                  </span>
-                  <span className={`font-bold text-foreground/30 line-through decoration-primary/40 decoration-1 transition-all opacity-60 ${
-                    isMobile ? 'text-lg' : (!isLarge ? 'text-[7px]' : 'text-xs md:text-2xl')
-                  }`}>
-                    {formatPrice(currentBasePrice, currency)}
-                  </span>
+          {siteConfig.hideAllPrices ? (
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col gap-1">
+                <div className={`flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] ${
+                  isMobile ? 'text-[8px]' : (!isLarge ? 'text-[6px]' : 'text-[10px]')
+                }`}>
+                  <span>{t.products.hardware}</span>
+                  <div className="h-[0.5px] w-3 bg-primary/40" />
                 </div>
+                <h3
+                  className={`font-black font-heading text-foreground leading-[1.1] ${
+                    isMobile ? 'text-lg' : (!isLarge ? 'text-xs md:text-sm' : 'text-xl md:text-3xl')
+                  }`}
+                >
+                  {item.title}
+                </h3>
+              </div>
+              <div className={`flex items-center justify-center bg-primary text-white transition-all shrink-0 group-hover:scale-105 group-active:scale-95 ${
+                isMobile || !isLarge ? 'w-8 h-8 rounded-lg' : 'w-10 h-10 md:w-12 md:h-12 rounded-xl'
+              } shadow-lg shadow-primary/30`}>
+                <ArrowRight className={isMobile || !isLarge ? 'w-4 h-4' : 'w-5 h-5'} />
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-1 md:gap-2">
+              <div className={`flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] ${
+                isMobile ? 'text-[8px]' : (!isLarge ? 'text-[6px]' : 'text-[10px]')
+              }`}>
+                <span>{t.products.hardware}</span>
+                <div className="h-[0.5px] w-3 bg-primary/40" />
               </div>
               
-              <button className={`flex items-center justify-center bg-primary text-white transition-all shrink-0 hover:scale-105 active:scale-95 ${
-                isMobile || !isLarge ? 'w-8 h-8 md:w-10 md:h-10 rounded-lg' : 'w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl'
-              } shadow-lg shadow-primary/30`}>
-                <ArrowRight className={isMobile || !isLarge ? 'w-4 h-4' : 'w-6 h-6 md:w-8 md:h-8'} />
-              </button>
+              <motion.h3
+                className={`font-black font-heading text-foreground leading-[1.1] ${
+                  isMobile ? 'text-xl' : (!isLarge ? 'text-xs md:text-xl' : 'text-xl md:text-4xl')
+                }`}
+              >
+                {item.title}
+              </motion.h3>
+
+              {isLarge && !isMobile && (
+                <p className="text-foreground/70 text-[10px] md:text-sm line-clamp-1 font-medium mt-1">
+                  {item.desc}
+                </p>
+              )}
+
+              <div className={`flex items-center justify-between mt-2 md:mt-4`}>
+                <div className="flex flex-col min-w-0">
+                  <span className={`font-black uppercase tracking-widest text-foreground/40 leading-none ${
+                    isMobile ? 'text-[8px]' : (!isLarge ? 'text-[5px]' : 'text-[8px]')
+                  }`}>{t.products.price}</span>
+                  <div className={`flex gap-1 md:gap-2 ${isLarge && !isMobile ? 'items-baseline flex-row' : 'flex-col items-start'}`}>
+                    <span className={`font-black font-heading text-primary leading-none truncate ${
+                      isMobile ? 'text-3xl' : (!isLarge ? 'text-xs md:text-lg' : 'text-xl md:text-5xl')
+                    }`}>
+                      {formatPrice(currentDiscountedPrice, currency)}
+                    </span>
+                    <span className={`font-bold text-foreground/30 line-through decoration-primary/40 decoration-1 transition-all opacity-60 ${
+                      isMobile ? 'text-lg' : (!isLarge ? 'text-[7px]' : 'text-xs md:text-2xl')
+                    }`}>
+                      {formatPrice(currentBasePrice, currency)}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className={`flex items-center justify-center bg-primary text-white transition-all shrink-0 group-hover:scale-105 group-active:scale-95 ${
+                  isMobile || !isLarge ? 'w-8 h-8 md:w-10 md:h-10 rounded-lg' : 'w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl'
+                } shadow-lg shadow-primary/30`}>
+                  <ArrowRight className={isMobile || !isLarge ? 'w-4 h-4' : 'w-6 h-6 md:w-8 md:h-8'} />
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </motion.div>
+    </button>
   );
 }
