@@ -398,24 +398,28 @@ export function SolarWizardResult({
                   <>
                     <h5 className="text-xl font-black font-heading mb-4 text-white">Would you like to install this system?</h5>
                     <p className="text-sm opacity-50 mb-6 text-white">Our technical team will review your local grid conditions and send you a fully itemized official project proposal.</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2 text-white">Your Name</label>
-                        <input type="text" placeholder="Designate project owner..." value={name} onChange={e=>setName(e.target.value)}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary transition-all text-white"/>
+                    
+                    {(!initialName && !initialPhone) && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div className="space-y-1">
+                          <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2 text-white">Your Name</label>
+                          <input type="text" placeholder="Designate project owner..." value={name} onChange={e=>setName(e.target.value)}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary transition-all text-white"/>
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2 text-white">WhatsApp Number</label>
+                          <input type="tel" placeholder="+ (Country Code) ..." value={phone} onChange={e=>setPhone(e.target.value)}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary transition-all text-white"/>
+                        </div>
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-[9px] font-black uppercase tracking-widest opacity-40 px-2 text-white">WhatsApp Number</label>
-                        <input type="tel" placeholder="+ (Country Code) ..." value={phone} onChange={e=>setPhone(e.target.value)}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary transition-all text-white"/>
-                      </div>
-                      <button 
-                        disabled={submitted}
-                        onClick={() => setSubmitted(true)}
-                        className="md:col-span-2 bg-white text-foreground py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all shadow-2xl">
-                        {submitted ? "Project Submitted Successfully" : "Submit Project for Engineering Review"}
-                      </button>
-                    </div>
+                    )}
+                    
+                    <button 
+                      disabled={submitted}
+                      onClick={() => setSubmitted(true)}
+                      className="w-full bg-white text-foreground py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all shadow-2xl">
+                      {submitted ? "Project Submitted Successfully" : "Request Official Quote (Call Us)"}
+                    </button>
                   </>
                 ) : (
                   <div className="flex flex-col items-center gap-6">

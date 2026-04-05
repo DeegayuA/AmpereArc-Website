@@ -483,17 +483,26 @@ export function RecommendationModal({ isOpen, onClose, quickUsageKwh, quickEvKm 
                                   {products
                                     .filter(p => p.subCategory === 'BESS (Battery Energy Storage)' && p.category === (answers.isCommercial ? 'Commercial' : 'Home'))
                                     .map(p => {
-                                      const selected = answers.selectedBatteryId === p.id || (!answers.selectedBatteryId && p.id === (answers.isCommercial ? "c-bess-50kwh" : "h-bess-16.8kwh"));
+                                      const autoSelectedId = liveDesign?.batteries?.product.id || (answers.isCommercial ? "c-bess-50kwh" : "h-bess-16.8kwh");
+                                      const selected = answers.selectedBatteryId === p.id || (!answers.selectedBatteryId && p.id === autoSelectedId);
+                                      
+                                      const hourlyUsage = (answers.monthlyUsageKwh / 30) / 24;
+                                      const realisticHours = Math.round((p.metadata.kwh || 0) / (hourlyUsage || 1));
+
                                       return (
                                         <button key={p.id} onClick={() => set("selectedBatteryId", p.id)}
-                                          className={`flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all ${selected ? "border-primary bg-primary/5" : "border-border/50 bg-white hover:border-primary/30"}`}>
+                                          className={`flex items-start gap-4 p-4 rounded-2xl border-2 text-left transition-all ${selected ? "border-primary bg-primary/5" : "border-border/50 bg-white hover:border-primary/30"}`}>
                                           <div className="w-12 h-12 relative rounded-lg overflow-hidden bg-secondary/10 shrink-0">
                                             <Image src={p.img} alt={p.title} fill className="object-cover"/>
                                           </div>
                                           <div className="flex-1 min-w-0">
                                             <p className={`text-xs font-black font-heading truncate ${selected ? "text-primary" : ""}`}>{p.title}</p>
                                             <p className="text-[10px] font-bold text-foreground/40">{p.metadata.kwh}kWh LFP</p>
-                                            {!siteConfig.hideAllPrices && <p className="text-[11px] font-black mt-1">{fmtUsd(p.basePrice * (1 - p.discountPercentage/100))}</p>}
+                                            <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-white border border-border/50 rounded-md">
+                                               <Zap className="w-3 h-3 text-primary" />
+                                               <span className="text-[9px] font-black uppercase tracking-wider">~{realisticHours}h Backup</span>
+                                            </div>
+                                            {!siteConfig.hideAllPrices && <p className="text-[11px] font-black mt-2">{fmtUsd(p.basePrice * (1 - p.discountPercentage/100))}</p>}
                                           </div>
                                           {selected && <CheckCircle2 className="w-5 h-5 text-primary shrink-0"/>}
                                         </button>
@@ -627,7 +636,7 @@ export function RecommendationModal({ isOpen, onClose, quickUsageKwh, quickEvKm 
                     {/* ── RESULT ── */}
                     {step==="result"&&(
                       design
-                        ? <SolarWizardResult design={design} fmtUsd={fmtUsd} currency={currency} onReset={reset} onClose={onClose} liveRates={liveRates} city={answers.city} countryCode={answers.countryCode}/>
+                        ? <SolarWizardResult design={design} fmtUsd={fmtUsd} currency={currency} onReset={reset} onClose={onClose} liveRates={liveRates} city={answers.city} countryCode={answers.countryCode} initialName={answers.name} initialPhone={answers.phone}/>
                         : (
                           <div className="flex flex-col items-center justify-center gap-6 py-32">
                             <motion.div 
